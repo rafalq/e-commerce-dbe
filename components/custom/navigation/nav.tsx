@@ -1,6 +1,7 @@
 import { auth } from '@/server/auth';
 import ButtonSignIn from './button-sign-in';
 import ButtonUser from './button-user';
+import Logo from './logo';
 
 export default async function Nav() {
   const session = await auth();
@@ -17,7 +18,9 @@ export default async function Nav() {
   return (
     <nav>
       <ul className='flex justify-between py-2 px-4'>
-        <li>LOGO</li>
+        <li>
+          <Logo />
+        </li>
         <li>{userAuth}</li>
       </ul>
     </nav>

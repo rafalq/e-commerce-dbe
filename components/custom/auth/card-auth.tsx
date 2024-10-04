@@ -35,7 +35,7 @@ export default function CardAuth({
         </CardFooter>
       )}
       <CardFooter className='mt-2 flex gap-2 justify-center'>
-        <p>No account?</p>
+        <p className='text-sm'>No account?</p>
         <ButtonBack href={buttonBackHref} label={buttonBackLabel} />
       </CardFooter>
     </Card>

@@ -10,7 +10,7 @@ type ButtonBackProps = {
 
 export default function ButtonBack({ href, label }: ButtonBackProps) {
   return (
-    <Button variant={'ghost'} className='underline font-semibold'>
+    <Button variant={'link'} className='underline font-semibold' asChild>
       <Link aria-label={label} href={href}>
         {label}
       </Link>
