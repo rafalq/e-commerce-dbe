@@ -1,7 +1,7 @@
-import { auth } from '@/server/auth';
-import ButtonSignIn from './button-sign-in';
-import ButtonUser from './button-user';
-import Logo from './logo';
+import { auth } from "@/server/auth";
+import ButtonSign from "./button-sign";
+import ButtonUser from "./button-user";
+import Logo from "./logo";
 
 export default async function Nav() {
   const session = await auth();
@@ -12,12 +12,12 @@ export default async function Nav() {
       <ButtonUser expires={session?.expires as string} user={session?.user} />
     );
   } else {
-    userAuth = <ButtonSignIn />;
+    userAuth = <ButtonSign />;
   }
 
   return (
     <nav>
-      <ul className='flex justify-between py-2 px-4'>
+      <ul className="flex justify-between py-2 px-4">
         <li>
           <Logo />
         </li>

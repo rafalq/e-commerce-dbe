@@ -4,9 +4,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import Socials from './socials';
-import ButtonBack from '../ui/button-back';
+} from "@/components/ui/card";
+import Socials from "./socials";
+import ButtonBack from "../ui/custom/button-back";
 
 type CardAuthProps = {
   cardTitle: string;
@@ -34,8 +34,7 @@ export default function CardAuth({
           <Socials />
         </CardFooter>
       )}
-      <CardFooter className='mt-2 flex gap-2 justify-center'>
-        <p className='text-sm'>No account?</p>
+      <CardFooter className="mt-2 flex gap-2 justify-center">
         <ButtonBack href={buttonBackHref} label={buttonBackLabel} />
       </CardFooter>
     </Card>

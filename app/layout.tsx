@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import Nav from '@/components/custom/navigation/nav';
+import Nav from '@/components/navigation/nav';
 import { cn } from '@/lib/utils';
 
 const geistSans = localFont({
@@ -29,7 +29,7 @@ export default function RootLayout({
     <html lang='en'>
       <body
         className={cn(
-          'px-4 py-2',
+          'px-4 py-2 flex flex-col min-h-screen',
           `${geistSans.variable} ${geistMono.variable} antialiased`
         )}
       >
@@ -37,7 +37,7 @@ export default function RootLayout({
           <Nav />
         </header>
         <main className='flex flex-col gap-4 p-8'>{children}</main>
-        <footer>FOOTER</footer>
+        <footer className='mt-auto'>FOOTER</footer>
       </body>
     </html>
   );
