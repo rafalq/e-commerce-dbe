@@ -4,9 +4,10 @@ import ButtonUser from "./button-user";
 import Logo from "./logo";
 
 export default async function Nav() {
-  const session = await auth();
+  const session = await auth;
 
   let userAuth: JSX.Element | null = null;
+
   if (session) {
     userAuth = (
       <ButtonUser expires={session?.expires as string} user={session?.user} />

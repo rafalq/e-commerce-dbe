@@ -5,15 +5,15 @@ import FormSignIn from "./form-sign-in";
 
 export default function FormSignInWrapper() {
   return (
-    <CardAuth
-      cardTitle="Welcome!"
-      buttonBackHref="/auth/sign-up"
-      buttonBackLabel="Create a new account"
-      showSocials
-    >
-      <div className="w-full md:max-w-lg mx-auto">
+    <div className="mx-auto w-full md:max-w-lg">
+      <CardAuth
+        cardTitle="Welcome!"
+        buttonBackHref="/auth/sign-up"
+        buttonBackLabel="Create a new account"
+        showSocials
+      >
         <FormSignIn />
-      </div>
-    </CardAuth>
+      </CardAuth>
+    </div>
   );
 }

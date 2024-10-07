@@ -23,6 +23,9 @@ import { z } from "zod";
 
 import type { FormAuthInput } from "@/types/form-auth";
 import { IoIosSend } from "react-icons/io";
+import { useState } from "react";
+import FormSuccess from "./form-success";
+import FormError from "./form-error";
 
 type InputName = {
   name: "email" | "password";
@@ -48,6 +51,9 @@ const formSignInInputs: FormSignInInput[] = [
 ];
 
 export default function FormSignIn() {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
   const form = useForm({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -56,11 +62,17 @@ export default function FormSignIn() {
     },
   });
 
-  // const [error, setError] = useState('')
-
   const { execute, status } = useAction(signInEmail, {
     onSuccess(data) {
-      console.log(data);
+      setShowNotification(true);
+
+      if (data.data?.status === "success") {
+        setSuccess(data.data.message as string);
+      }
+
+      if (data.data?.status === "error") {
+        setError(data.data.message as string);
+      }
     },
   });
 
@@ -70,7 +82,10 @@ export default function FormSignIn() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         {formSignInInputs.map((input) => (
           <FormField
             key={input.name}
@@ -94,6 +109,13 @@ export default function FormSignIn() {
           />
         ))}
 
+        {showNotification && (
+          <>
+            <FormSuccess message={success} />
+            <FormError message={error} />
+          </>
+        )}
+
         <div className="flex justify-between mt-2 mb-6">
           <Button size={"sm"} variant={"link"} asChild>
             <Link href="/auth/reset" className="underline">
@@ -101,13 +123,14 @@ export default function FormSignIn() {
             </Link>
           </Button>
           <Button
+            onClick={() => setShowNotification(false)}
             type="submit"
             className={cn(
               "px-8",
               status === "executing" ? "animate-pulse" : null
             )}
           >
-            <p>{"Sign In"}</p> <IoIosSend className="w-5 h-5 ml-2" />
+            <p>{"Sign In"}</p> <IoIosSend className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </form>

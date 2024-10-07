@@ -8,9 +8,9 @@ export default function FormSuccess({ message }: FormSuccessProps) {
   if (!message) return null;
 
   return (
-    <div className="bg-teal-400 text-secondary-foreground p-3">
-      <TiTick className="w-4 h-4" />
-      <p className="text-teal-400">{message}</p>
+    <div className="bg-teal-300 text-secondary-foreground p-3 flex gap-4 justify-center items-center shadow">
+      <TiTick className="w-8 h-8" />
+      <p className="font-semibold">{message}</p>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 "use client";
 
-// import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,18 +12,21 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { signInEmail } from "@/server/actions/sign-in-email";
 import { SignUpSchema } from "@/types/sign-up-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoIosSend } from "react-icons/io";
 import { z } from "zod";
 
+import { signUpEmail } from "@/server/actions/sign-up-email";
 import type { FormAuthInput } from "@/types/form-auth";
+import FormError from "./form-error";
+import FormSuccess from "./form-success";
 
 type InputName = {
-  name: "name" | "email" | "password";
+  name: "name" | "email" | "password" | "passwordConfirmation";
 };
 
 type FormSignUpProps = FormAuthInput & InputName;
@@ -34,7 +36,7 @@ const formSignUpInputs: FormSignUpProps[] = [
     name: "name",
     label: "Name",
     type: "text",
-    placeholder: "Bob",
+    placeholder: "Bobby",
     autoComplete: "email",
   },
   {
@@ -51,23 +53,38 @@ const formSignUpInputs: FormSignUpProps[] = [
     placeholder: "**********",
     autoComplete: "current-password",
   },
+  {
+    name: "passwordConfirmation",
+    label: "Password Confirmation",
+    type: "password",
+    placeholder: "**********",
+    autoComplete: "current-password",
+  },
 ];
 
 export default function FormSignUp() {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showNotification, setShowNotification] = useState(false);
+
   const form = useForm({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
+      passwordConfirmation: "",
     },
   });
 
-  // const [error, setError] = useState('')
-
-  const { execute, status } = useAction(signInEmail, {
+  const { execute, status } = useAction(signUpEmail, {
     onSuccess(data) {
-      console.log(data);
+      setShowNotification(true);
+      if (data.data?.status === "error") {
+        setError(data.data.message || "");
+      } else if (data.data?.status === "success") {
+        setSuccess(data.data.message || "");
+      }
     },
   });
 
@@ -77,7 +94,10 @@ export default function FormSignUp() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
         {formSignUpInputs.map((input) => (
           <FormField
             key={input.name}
@@ -101,15 +121,23 @@ export default function FormSignUp() {
           />
         ))}
 
+        {showNotification && (
+          <>
+            <FormSuccess message={success} />
+            <FormError message={error} />
+          </>
+        )}
+
         <div className="flex flex-row-reverse justify-between mt-2 mb-6">
           <Button
+            onClick={() => setShowNotification(false)}
             type="submit"
             className={cn(
               "px-8",
               status === "executing" ? "animate-pulse" : null
             )}
           >
-            <p>{"Sign Up"}</p> <IoIosSend className="w-5 h-5 ml-2" />
+            <p>{"Sign Up"}</p> <IoIosSend className="ml-2 w-5 h-5" />
           </Button>
         </div>
       </form>

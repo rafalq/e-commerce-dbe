@@ -15,6 +15,41 @@
       "when": 1728059724601,
       "tag": "0001_overrated_mephistopheles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1728219973963,
+      "tag": "0002_stiff_khan",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1728221142263,
+      "tag": "0003_white_blue_shield",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1728221597933,
+      "tag": "0004_brainy_doorman",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1728222205207,
+      "tag": "0005_cold_longshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1728224416148,
+      "tag": "0006_tidy_jocasta",
+      "breakpoints": true
     }
   ]
 }
