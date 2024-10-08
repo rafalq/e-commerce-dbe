@@ -5,13 +5,13 @@ import { eq } from "drizzle-orm";
 import { db } from "..";
 import { users } from "../schema";
 import { actionClient } from "./action-client";
-import { SignUpSchema } from "@/types/sign-up-schema";
-import { generateVerificationToken } from "./verification-tokens";
+import { SchemaSignUp } from "@/types/schema-sign-up";
+import { generateEmailVerificationToken } from "./tokens";
 import { sendTokenToEmail } from "./send-token-to-email";
 import type { FormStatus } from "@/types/form-status";
 
 export const signUpEmail = actionClient
-  .schema(SignUpSchema)
+  .schema(SchemaSignUp)
   .action(
     async ({
       parsedInput: { name, email, password, passwordConfirmation },
@@ -35,10 +35,13 @@ export const signUpEmail = actionClient
       // --- is email already in the database? ---
       if (existingUser) {
         if (!existingUser.emailVerified) {
-          const verificationToken = await generateVerificationToken(email);
+          const verificationToken = await generateEmailVerificationToken(email);
           await sendTokenToEmail(
             verificationToken[0].email,
-            verificationToken[0].token
+            verificationToken[0].token,
+            "/auth/email-verification",
+            "E-commerce DBE Confirmation Email",
+            "to confirm your email"
           );
 
           return {
@@ -58,10 +61,13 @@ export const signUpEmail = actionClient
         password: hashedPassword,
       });
 
-      const verificationToken = await generateVerificationToken(email);
+      const verificationToken = await generateEmailVerificationToken(email);
       await sendTokenToEmail(
         verificationToken[0].email,
-        verificationToken[0].token
+        verificationToken[0].token,
+        "/auth/verification",
+        "E-commerce DBE Confirmation Email",
+        "to confirm your email."
       );
 
       return {

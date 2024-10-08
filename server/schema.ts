@@ -68,3 +68,43 @@ export const verificationTokens = pgTable(
     }),
   })
 );
+
+export const resetPasswordTokens = pgTable(
+  "resetPasswordToken",
+  {
+    id: text("id")
+      .notNull()
+      .$defaultFn(() => createId()),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+    email: text("email").notNull(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (resetPasswordToken) => ({
+    compositePk: primaryKey({
+      columns: [resetPasswordToken.id, resetPasswordToken.token],
+    }),
+  })
+);
+
+export const twoFactorTokens = pgTable(
+  "twoFactorToken",
+  {
+    id: text("id")
+      .notNull()
+      .$defaultFn(() => createId()),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+    email: text("email").notNull(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+  },
+  (twoFactorToken) => ({
+    compositePk: primaryKey({
+      columns: [twoFactorToken.id, twoFactorToken.token],
+    }),
+  })
+);

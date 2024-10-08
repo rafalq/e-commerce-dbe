@@ -1,13 +1,14 @@
 "use client";
 
-import { verifyEmail } from "@/server/actions/verification-tokens";
+import { verifyEmail } from "@/server/actions/tokens";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import CardAuth from "./card-auth";
-import FormSuccess from "./form-success";
-import FormError from "./form-error";
-
-export default function FormVerification() {
+import {
+  NotificationSuccess,
+  NotificationError,
+} from "../ui/custom/notifications";
+export default function FormEmailVerification() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
@@ -45,8 +46,8 @@ export default function FormVerification() {
     >
       <div className="flex flex-col justify-center items-center p-6 w-full">
         <p>{!success && !error && "Verification in progress..."}</p>
-        <FormSuccess message={success} />
-        <FormError message={error} />
+        <NotificationSuccess message={success} />
+        <NotificationError message={error} />
       </div>
     </CardAuth>
   );

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Session } from 'next-auth';
-import { signOut } from 'next-auth/react';
+import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 
 export default function ButtonUser({ user }: Session) {
   return (
@@ -9,7 +9,7 @@ export default function ButtonUser({ user }: Session) {
       <h1>{user?.email}</h1>
       <button
         onClick={() => signOut()}
-        className='border border-slate-500 px-1'
+        className="border-slate-500 px-1 border"
       >
         Sign Out
       </button>

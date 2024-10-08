@@ -6,14 +6,20 @@ import getBaseURL from "@/lib/get-base-url";
 const resend = new Resend(process.env.RESEND_API_KEY);
 const domain = getBaseURL();
 
-export async function sendTokenToEmail(email: string, token: string) {
-  const confirmationLink = `${domain}/auth/verification?token=${token}`;
+export async function sendTokenToEmail(
+  email: string,
+  token: string,
+  path: string,
+  subject: string,
+  text?: string
+) {
+  const link = `${domain}${path}?token=${token}`;
 
   const { data, error } = await resend.emails.send({
     from: "Acme <onboarding@resend.dev>",
     to: [email],
-    subject: "E-commerce DBE Confirmation Email",
-    html: `<p>Click to <a href='${confirmationLink}'>confirm your email.</a></p>`,
+    subject: `${subject}`,
+    html: `<p>Click <a href='${link}'>here </a>${text}</p>`,
   });
 
   if (error) {

@@ -7,8 +7,18 @@ import Google from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import type { Adapter } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
-import { SignInSchema } from "@/types/sign-in-schema";
+import { SchemaSignIn } from "@/types/schema-sign-in";
 import { eq } from "drizzle-orm";
+
+// Define a type for the User object NextAuth expects
+type User = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  image?: string | null;
+  emailVerified?: Date | null;
+  role?: string | null; // Add other fields expected by NextAuth, except for sensitive ones like password
+};
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db) as Adapter,
@@ -27,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
     Credentials({
       authorize: async (credentials) => {
-        const validatedFields = SignInSchema.safeParse(credentials);
+        const validatedFields = SchemaSignIn.safeParse(credentials);
 
         if (validatedFields.success) {
           const { email, password } = validatedFields.data;
@@ -40,10 +50,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           const passwordMatch = await bcrypt.compare(password, user.password);
 
-          if (passwordMatch) return user;
+          if (!passwordMatch) return null;
 
-          return null;
+          // Return a sanitized user object, excluding sensitive data like password
+          const sanitizedUser: User = {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            image: user.image,
+            emailVerified: user.emailVerified,
+            role: user.role,
+          };
+
+          return sanitizedUser; // Make sure this conforms to the NextAuth `User` type
         }
+
+        return null;
       },
     }),
   ],

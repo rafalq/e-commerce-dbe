@@ -4,7 +4,7 @@ import ButtonUser from "./button-user";
 import Logo from "./logo";
 
 export default async function Nav() {
-  const session = await auth;
+  const session = await auth();
 
   let userAuth: JSX.Element | null = null;
 
@@ -18,7 +18,7 @@ export default async function Nav() {
 
   return (
     <nav>
-      <ul className="flex justify-between py-2 px-4">
+      <ul className="flex justify-between px-4 py-2">
         <li>
           <Logo />
         </li>

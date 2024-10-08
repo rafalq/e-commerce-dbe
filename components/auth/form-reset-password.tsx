@@ -12,36 +12,29 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { SchemaSignUp } from "@/types/schema-sign-up";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { IoIosSend } from "react-icons/io";
 import { z } from "zod";
 
-import { signUpEmail } from "@/server/actions/sign-up-email";
+import { resetPassword } from "@/server/actions/reset-password";
 import type { FormAuthInput } from "@/types/form-auth";
+import { SchemaResetPassword } from "@/types/schema-reset-password";
+import { IoIosSend } from "react-icons/io";
 import {
-  NotificationSuccess,
   NotificationError,
+  NotificationSuccess,
 } from "../ui/custom/notifications";
 import FormWrapper from "../ui/custom/form-wrapper";
 
 type InputName = {
-  name: "name" | "email" | "password" | "passwordConfirmation";
+  name: "email";
 };
 
-type FormSignUpProps = FormAuthInput & InputName;
+type FormResetPasswordInput = FormAuthInput & InputName;
 
-const formSignUpInputs: FormSignUpProps[] = [
-  {
-    name: "name",
-    label: "Name",
-    type: "text",
-    placeholder: "Bobby",
-    autoComplete: "email",
-  },
+const formResetPasswordInputs: FormResetPasswordInput[] = [
   {
     name: "email",
     label: "Email",
@@ -49,65 +42,51 @@ const formSignUpInputs: FormSignUpProps[] = [
     placeholder: "e-commerce-dbe@email.com",
     autoComplete: "email",
   },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    placeholder: "**********",
-    autoComplete: "current-password",
-  },
-  {
-    name: "passwordConfirmation",
-    label: "Password Confirmation",
-    type: "password",
-    placeholder: "**********",
-    autoComplete: "current-password",
-  },
 ];
 
-export default function FormSignUp() {
+export default function FormResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [showNotification, setShowNotification] = useState(false);
 
-  const form = useForm({
-    resolver: zodResolver(SchemaSignUp),
+  const form = useForm<z.infer<typeof SchemaResetPassword>>({
+    resolver: zodResolver(SchemaResetPassword),
     defaultValues: {
-      name: "",
       email: "",
-      password: "",
-      passwordConfirmation: "",
     },
   });
 
-  const { execute, status } = useAction(signUpEmail, {
+  const { execute, status } = useAction(resetPassword, {
     onSuccess(data) {
       setShowNotification(true);
+
+      if (data.data?.status === "success") {
+        setSuccess(data.data.message);
+      }
+
       if (data.data?.status === "error") {
-        setError(data.data.message || "");
-      } else if (data.data?.status === "success") {
-        setSuccess(data.data.message || "");
+        setError(data.data.message);
       }
     },
   });
 
-  function onSubmit(values: z.infer<typeof SchemaSignUp>) {
+  function onSubmit(values: z.infer<typeof SchemaResetPassword>) {
     execute(values);
   }
 
   return (
     <FormWrapper
-      cardTitle="Create an account"
+      cardTitle="Reset Password"
       buttonBackHref="/auth/sign-in"
-      buttonBackLabel="Have an account?"
-      showSocials
+      buttonBackLabel="Back To Sign in"
+      showSocials={false}
     >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-4"
         >
-          {formSignUpInputs.map((input) => (
+          {formResetPasswordInputs.map((input) => (
             <FormField
               key={input.name}
               control={form.control}
@@ -121,6 +100,7 @@ export default function FormSignUp() {
                       type={input.type}
                       placeholder={input?.placeholder}
                       autoComplete={input?.autoComplete}
+                      disabled={status === "executing"}
                     />
                   </FormControl>
                   <FormDescription />
@@ -140,13 +120,15 @@ export default function FormSignUp() {
           <div className="flex flex-row-reverse justify-between mt-2 mb-6">
             <Button
               onClick={() => setShowNotification(false)}
+              disabled={status === "executing"}
               type="submit"
               className={cn(
                 "px-8",
                 status === "executing" ? "animate-pulse" : null
               )}
             >
-              <p>{"Sign Up"}</p> <IoIosSend className="ml-2 w-5 h-5" />
+              <p>{"Submit Request For New Password"}</p>{" "}
+              <IoIosSend className="ml-2 w-5 h-5" />
             </Button>
           </div>
         </form>

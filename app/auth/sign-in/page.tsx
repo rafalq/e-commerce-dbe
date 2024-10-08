@@ -1,9 +1,9 @@
-import FormSignInWrapper from "@/components/auth/form-sign-in-wrapper";
+import FormSignIn from "@/components/auth/form-sign-in";
 
 export default function SignInPage() {
   return (
-    <div className="p-4 w-full md:max-w-3xl mx-auto">
-      <FormSignInWrapper />
+    <div className="mx-auto p-4 w-full md:max-w-3xl">
+      <FormSignIn />
     </div>
   );
 }

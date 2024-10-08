@@ -50,6 +50,13 @@
       "when": 1728224416148,
       "tag": "0006_tidy_jocasta",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1728389962928,
+      "tag": "0007_chilly_scalphunter",
+      "breakpoints": true
     }
   ]
 }
