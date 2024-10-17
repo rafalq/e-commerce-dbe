@@ -68,3 +68,8 @@ body {
     --chart-5: 340 75% 55%;
   }
 }
+
+/* uploadthing button bg during uploading */
+[data-ut-element="button"][data-state="uploading"]::after {
+  @apply bg-primary/50;
+}

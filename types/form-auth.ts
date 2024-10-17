@@ -23,6 +23,7 @@ type InputType =
   | "week";
 
 export type FormAuthInput = {
+  custom?: boolean;
   label?: string;
   type: InputType;
   placeholder?: string;

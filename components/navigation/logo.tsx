@@ -1,9 +1,7 @@
-import Link from "next/link";
+type LogoProps = {
+  text?: string;
+};
 
-export default function Logo() {
-  return (
-    <Link href="/">
-      <p>LOGO</p>
-    </Link>
-  );
+export default function Logo({ text }: LogoProps) {
+  return <p className="font-semibold text-2xl">{text ? text : "LOGO"}</p>;
 }

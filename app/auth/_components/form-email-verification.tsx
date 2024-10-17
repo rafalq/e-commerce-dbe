@@ -7,7 +7,7 @@ import CardAuth from "./card-auth";
 import {
   NotificationSuccess,
   NotificationError,
-} from "../ui/custom/notifications";
+} from "@/components/ui/custom/notifications";
 export default function FormEmailVerification() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");

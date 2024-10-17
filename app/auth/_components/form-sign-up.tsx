@@ -25,8 +25,8 @@ import type { FormAuthInput } from "@/types/form-auth";
 import {
   NotificationSuccess,
   NotificationError,
-} from "../ui/custom/notifications";
-import FormWrapper from "../ui/custom/form-wrapper";
+} from "@/components/ui/custom/notifications";
+import FormWrapper from "@/app/auth/_components/form-wrapper";
 
 type InputName = {
   name: "name" | "email" | "password" | "passwordConfirmation";
@@ -40,7 +40,6 @@ const formSignUpInputs: FormSignUpProps[] = [
     label: "Name",
     type: "text",
     placeholder: "Bobby",
-    autoComplete: "email",
   },
   {
     name: "email",

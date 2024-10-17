@@ -25,8 +25,8 @@ import { IoIosSend } from "react-icons/io";
 import {
   NotificationError,
   NotificationSuccess,
-} from "../ui/custom/notifications";
-import FormWrapper from "../ui/custom/form-wrapper";
+} from "@/components/ui/custom/notifications";
+import FormWrapper from "@/app/auth/_components/form-wrapper";
 import { useSearchParams } from "next/navigation";
 
 type InputName = {

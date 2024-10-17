@@ -1,12 +1,12 @@
 "use client";
 
-import CardAuth from "../../auth/card-auth";
+import CardAuth from "@/app/auth/_components/card-auth";
 
 type FormWrapperProps = {
-  cardTitle: string;
-  buttonBackHref: string;
-  buttonBackLabel: string;
-  showSocials: boolean;
+  cardTitle?: string;
+  buttonBackHref?: string;
+  buttonBackLabel?: string;
+  showSocials?: boolean;
   children: React.ReactNode;
 };
 
@@ -20,7 +20,7 @@ export default function FormWrapper({
   return (
     <div className="mx-auto w-full md:max-w-lg">
       <CardAuth
-        cardTitle={cardTitle}
+        cardTitle={cardTitle || ""}
         buttonBackHref={buttonBackHref}
         buttonBackLabel={buttonBackLabel}
         showSocials={showSocials}

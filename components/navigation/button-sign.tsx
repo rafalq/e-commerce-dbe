@@ -1,10 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaUserPlus } from "react-icons/fa";
 import { PiSignIn } from "react-icons/pi";
+
+import { Button } from "@/components/ui/button";
+
 export default function ButtonSign() {
   const currentPath = usePathname();
 

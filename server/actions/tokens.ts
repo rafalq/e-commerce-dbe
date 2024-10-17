@@ -1,8 +1,13 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { db } from "..";
-import { resetPasswordTokens, users, verificationTokens } from "../schema";
+import { db } from "@/server/index";
+import {
+  resetPasswordTokens,
+  twoFactorTokens,
+  users,
+  verificationTokens,
+} from "@/server/schema";
 
 // --- email verification ---
 
@@ -81,29 +86,6 @@ export async function verifyEmail(token: string) {
 
 // ---- reset password ---
 
-export async function getResetPasswordTokenByToken(token: string) {
-  try {
-    const resetPasswordToken = await db.query.resetPasswordTokens.findFirst({
-      where: eq(resetPasswordTokens.token, token),
-    });
-    return resetPasswordToken;
-  } catch (error) {
-    return { status: "error", message: error || "Token not found." };
-  }
-}
-
-export async function getResetPasswordTokenByEmail(email: string) {
-  try {
-    const token = await db.query.resetPasswordTokens.findFirst({
-      where: eq(resetPasswordTokens.email, email),
-    });
-    return token;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
-
 export async function generateResetPasswordToken(email: string) {
   try {
     const newToken = crypto.randomUUID();
@@ -133,83 +115,90 @@ export async function generateResetPasswordToken(email: string) {
 
     return resetPasswordToken;
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return null;
   }
 }
 
-// export async function getToken(token: Token) {
-//   try {
-//     let tokenFromDB = null;
-//     if (token.receivedBy === "email") {
-//       if (token.type === "email-verification") {
-//         tokenFromDB = await db.query.verificationTokens.findFirst({
-//           where: eq(verificationTokens.email, token.email || ""),
-//         });
-//         return tokenFromDB;
-//       }
-//       if (token.type === "reset-password") {
-//         tokenFromDB = await db.query.resetPasswordTokens.findFirst({
-//           where: eq(resetPasswordTokens.email, token.email || ""),
-//         });
-//         return tokenFromDB;
-//       }
-//     } else if (token.receivedBy === "token") {
-//       if (token.type === "reset-password") {
-//         tokenFromDB = await db.query.resetPasswordTokens.findFirst({
-//           where: eq(resetPasswordTokens.token, token.token || ""),
-//         });
-//         return tokenFromDB;
-//       }
-//     }
-//   } catch (error) {
-//     return { status: "error", message: error || "Token not found." };
-//   }
-// }
+export async function getResetPasswordTokenByToken(token: string) {
+  try {
+    const resetPasswordToken = await db.query.resetPasswordTokens.findFirst({
+      where: eq(resetPasswordTokens.token, token),
+    });
+    return resetPasswordToken;
+  } catch (error) {
+    return { status: "error", message: error || "Token not found." };
+  }
+}
 
-// export async function generateToken(token: Token, userEmail: string) {
-//   const existingToken = await getToken(token);
+export async function getResetPasswordTokenByEmail(email: string) {
+  try {
+    const token = await db.query.resetPasswordTokens.findFirst({
+      where: eq(resetPasswordTokens.email, email),
+    });
+    return token;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
 
-//   if (existingToken) {
-//     if (token.type === "email-verification") {
-//       await db
-//         .delete(verificationTokens)
-//         .where(eq(verificationTokens.email, userEmail));
-//     }
-//   } else if (token.type === "reset-password") {
-//     await db
-//       .delete(resetPasswordTokens)
-//       .where(eq(resetPasswordTokens.email, userEmail));
-//   }
-//   const tokenUser = await db.query.users.findFirst({
-//     where: eq(users.email, userEmail),
-//   });
+// --- two factor authentication ---
 
-//   if (token.type === "email-verification") {
-//     const tokenObj = await db
-//       .insert(verificationTokens)
-//       .values({
-//         token: newToken,
-//         expires,
-//         email: userEmail,
-//         userId: tokenUser?.id as string,
-//       })
-//       .returning();
+export async function generateTwoFactorToken(email: string) {
+  try {
+    const arr = new Uint16Array(1);
+    const newToken = crypto.getRandomValues(arr);
 
-//     return tokenObj;
-//   } else if (token.type === "reset-password") {
-//     const tokenObj = await db
-//       .insert(resetPasswordTokens)
-//       .values({
-//         token: newToken,
-//         expires,
-//         email: userEmail,
-//         userId: tokenUser?.id as string,
-//       })
-//       .returning();
+    const expires = new Date(new Date().getTime() + 3600 * 1000);
 
-//     return tokenObj;
-//   }
+    const existingToken = await getTwoFactorTokenByEmail(email);
 
-//   return null;
-// }
+    if (existingToken) {
+      await db.delete(twoFactorTokens).where(eq(twoFactorTokens.email, email));
+    }
+
+    const tokenUser = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    const twoFactorToken = db
+      .insert(twoFactorTokens)
+      .values({
+        token: newToken[0].toString(),
+        expires,
+        email,
+        userId: tokenUser?.id as string,
+      })
+      .returning();
+
+    return twoFactorToken;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function getTwoFactorTokenByEmail(email: string) {
+  try {
+    const twoFactorToken = await db.query.twoFactorTokens.findFirst({
+      where: eq(twoFactorTokens.email, email),
+    });
+    return twoFactorToken;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function getTwoFactorTokenByToken(token: string) {
+  try {
+    const twoFactorToken = await db.query.twoFactorTokens.findFirst({
+      where: eq(resetPasswordTokens.token, token),
+    });
+    return twoFactorToken;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}

@@ -1,7 +1,9 @@
 import { auth } from "@/server/auth";
+
 import ButtonSign from "./button-sign";
 import ButtonUser from "./button-user";
 import Logo from "./logo";
+import Link from "next/link";
 
 export default async function Nav() {
   const session = await auth();
@@ -18,9 +20,11 @@ export default async function Nav() {
 
   return (
     <nav>
-      <ul className="flex justify-between px-4 py-2">
+      <ul className="flex justify-around px-4 py-2">
         <li>
-          <Logo />
+          <Link href="/" aria-label="e-commerce dbe logo">
+            <Logo text="E-commerce dbe" />
+          </Link>
         </li>
         <li>{userAuth}</li>
       </ul>

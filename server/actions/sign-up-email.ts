@@ -65,7 +65,7 @@ export const signUpEmail = actionClient
       await sendTokenToEmail(
         verificationToken[0].email,
         verificationToken[0].token,
-        "/auth/verification",
+        "/auth/email-verification",
         "E-commerce DBE Confirmation Email",
         "to confirm your email."
       );

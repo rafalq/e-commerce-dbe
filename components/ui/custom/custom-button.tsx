@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type ButtonCustomProps = {
+type CustomButtonProps = {
   onClick?: () => void;
   className?: string;
 } & (
@@ -9,7 +9,7 @@ type ButtonCustomProps = {
   | { customVariant: "blank"; children: React.ReactNode }
 );
 
-export function ButtonCustom(props: ButtonCustomProps) {
+export function CustomButton(props: CustomButtonProps) {
   return (
     <Button
       onClick={props.onClick}

@@ -1,5 +1,5 @@
-import FormEmailVerification from "@/components/auth/form-email-verification";
+import FormEmailVerification from "@/app/auth/_components/form-email-verification";
 
-export default function Verification() {
+export default function VerificationPage() {
   return <FormEmailVerification />;
 }

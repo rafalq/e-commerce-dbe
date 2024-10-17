@@ -1,21 +1,21 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { ButtonCustom } from "../ui/custom/button-custom";
+import { CustomButton } from "@/components/ui/custom/custom-button";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 
 export default function Socials() {
   return (
-    <div className="flex flex-col items-center w-full gap-4">
-      <ButtonCustom
+    <div className="flex flex-col items-center gap-4 w-full">
+      <CustomButton
         onClick={() => signIn("google", { redirect: false, callbackUrl: "/" })}
         customVariant="titled"
         title="Sign in with Google"
         icon={<FcGoogle className="w-5 h-5" />}
         className={"border border-primary"}
       />
-      <ButtonCustom
+      <CustomButton
         onClick={() => signIn("github", { redirect: false, callbackUrl: "/" })}
         customVariant="titled"
         title="Sign in with Github"

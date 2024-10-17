@@ -1,5 +1,5 @@
 export type FormStatus = {
-  status: "error" | "success";
+  status: "error" | "success" | "two-factor";
   message?: string;
   data?: unknown;
 };

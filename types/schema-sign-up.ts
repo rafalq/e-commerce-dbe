@@ -19,5 +19,5 @@ export const SchemaSignUp = z
   // })
   .refine((data) => data.password === data.passwordConfirmation, {
     message: "Passwords do not match.",
-    path: ["passwordConfirmation"], // Then, also set the error path to `passwordConfirmation`
+    path: ["passwordConfirmation"],
   });
