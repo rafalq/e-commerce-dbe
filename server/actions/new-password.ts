@@ -1,7 +1,7 @@
 "use server";
 
 import { SchemaNewPassword } from "@/types/schema-new-password";
-import { actionClient } from "./action-client";
+import { actionClient } from ".";
 import {
   generateEmailVerificationToken,
   getResetPasswordTokenByToken,

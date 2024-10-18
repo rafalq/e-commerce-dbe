@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "..";
 import { auth } from "../auth";
 import { users } from "../schema";
-import { actionClient } from "./action-client";
+import { actionClient } from ".";
 
 export const settingsUpdate = actionClient
   .schema(SchemaSettings)

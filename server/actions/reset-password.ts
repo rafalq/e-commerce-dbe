@@ -4,7 +4,7 @@ import { SchemaResetPassword } from "@/types/schema-reset-password";
 import { eq } from "drizzle-orm";
 import { db } from "..";
 import { users } from "../schema";
-import { actionClient } from "./action-client";
+import { actionClient } from ".";
 import { generateResetPasswordToken } from "./tokens";
 import { sendTokenToEmail } from "./send-token-to-email";
 

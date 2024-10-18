@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "px-4 py-2 flex flex-col min-h-screen",
+          "px-4 flex flex-col min-h-screen",
           `${geistSans.variable} ${geistMono.variable} antialiased`
         )}
       >
@@ -38,7 +38,7 @@ export default function RootLayout({
           <header>
             <Nav />
           </header>
-          <main className="flex flex-col gap-4 p-8">{children}</main>
+          <main className="flex flex-col gap-4 px-2">{children}</main>
           <footer className="mt-auto">FOOTER</footer>
         </ThemeProvider>
       </body>

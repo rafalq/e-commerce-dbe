@@ -26,9 +26,9 @@ import { cn } from "@/lib/utils";
 import { settingsUpdate } from "@/server/actions/settings-update";
 import { SchemaSettings } from "@/types/schema-settings";
 
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, LoaderCircle, Pen } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoIosSend } from "react-icons/io";
 
 import type { Session } from "next-auth";
@@ -43,6 +43,7 @@ export function FormSettings({ session }: FormSettings) {
   const [success, setSuccess] = useState("");
   const [showNotification, setShowNotification] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [isSubmitButtonBlocked, setIsSubmitButtonBlocked] = useState(true);
 
   const form = useForm({
     resolver: zodResolver(SchemaSettings),
@@ -67,6 +68,14 @@ export function FormSettings({ session }: FormSettings) {
     },
   });
 
+  // Watch for any input change and unblock the submit button
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      setIsSubmitButtonBlocked(false);
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   function onSubmit(parsedInput: z.infer<typeof SchemaSettings>) {
     execute(parsedInput);
   }
@@ -83,15 +92,15 @@ export function FormSettings({ session }: FormSettings) {
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col gap-6"
       >
-        <>
+        <div className="flex justify-between">
           {/* --- avatar input --- */}
           <FormField
             control={form.control}
             name="image"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Avatar</FormLabel>
-                <div className="flex items-center gap-4">
+                <FormLabel className="font-semibold">Avatar</FormLabel>
+                <div className="flex items-center">
                   {!form.getValues("image") && (
                     <div className="font-bold">
                       {session.user?.name?.charAt(0).toUpperCase()}
@@ -107,7 +116,7 @@ export function FormSettings({ session }: FormSettings) {
                     />
                   )}
                   <UploadButton
-                    className="ut-allowed-content:hidden ut-label:hidden hover:ut-button:bg-primary/100 ut-button:bg-primary/75 ut-label:bg-red-50 ut-button:ring-primary ut:button:transition-all ut-button:duration-500 scale-75"
+                    className="ut-button:-top-12 ut-button:absolute ut-allowed-content:hidden ut-label:hidden hover:ut-button:bg-primary/40 ut-button:bg-primary/30 ut-label:bg-red-50 ut-button:p-2 ut-button:rounded-full ut-button:ring-primary ut-button:w-auto ut-button:h-auto ut-button:font-semibold ut:button:transition-all ut-button:duration-500 scale-50"
                     endpoint="avatarUploader"
                     onUploadBegin={() => {
                       setAvatarUploading(true);
@@ -127,8 +136,8 @@ export function FormSettings({ session }: FormSettings) {
                     }}
                     content={{
                       button({ ready }) {
-                        if (ready) return <div>Change Avatar</div>;
-                        return <div>Uploading...</div>;
+                        if (ready) return <Pen />;
+                        return <LoaderCircle className="animate-spin" />;
                       },
                     }}
                   />
@@ -166,7 +175,7 @@ export function FormSettings({ session }: FormSettings) {
               </FormItem>
             )}
           />
-        </>
+        </div>
 
         <>
           {/* --- email input --- */}
@@ -292,9 +301,12 @@ export function FormSettings({ session }: FormSettings) {
           <Button
             onClick={clearNotifications}
             type="submit"
-            disabled={status === "executing" || avatarUploading}
+            disabled={
+              status === "executing" || avatarUploading || isSubmitButtonBlocked
+            }
             className={cn(
-              "px-8 bg-primary",
+              `px-8 bg-primary`,
+
               status === "executing" ? "animate-pulse" : null
             )}
           >

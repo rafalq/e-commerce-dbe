@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import { db } from "..";
 import { users } from "../schema";
-import { actionClient } from "./action-client";
+import { actionClient } from ".";
 import { SchemaSignUp } from "@/types/schema-sign-up";
 import { generateEmailVerificationToken } from "./tokens";
 import { sendTokenToEmail } from "./send-token-to-email";
@@ -26,6 +26,9 @@ export const signUpEmail = actionClient
 
       // --- hash password ---
       const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Debug logging to ensure password was hashed
+      console.log("Hashed password:", hashedPassword);
 
       // --- check for existing user ---
       const existingUser = await db.query.users.findFirst({

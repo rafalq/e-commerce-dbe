@@ -1,6 +1,6 @@
 "use server";
 
-import { actionClient } from "@/server/actions/action-client";
+import { actionClient } from "@/server/actions";
 import { db } from "@/server/index";
 import { twoFactorTokens, users } from "@/server/schema";
 import { SchemaSignIn } from "@/types/schema-sign-in";
