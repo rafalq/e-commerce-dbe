@@ -23,9 +23,9 @@ import { z } from "zod";
 import { signUpEmail } from "@/server/actions/sign-up-email";
 import type { FormAuthInput } from "@/types/form-auth";
 import {
-  NotificationSuccess,
-  NotificationError,
-} from "@/components/ui/custom/notifications";
+  CustomNotificationSuccess,
+  CustomNotificationError,
+} from "@/components/ui/custom-notifications";
 import FormWrapper from "@/app/auth/_components/form-wrapper";
 
 type InputName = {
@@ -131,8 +131,8 @@ export default function FormSignUp() {
 
           {showNotification && (
             <>
-              <NotificationSuccess message={success} />
-              <NotificationError message={error} />
+              <CustomNotificationSuccess message={success} />
+              <CustomNotificationError message={error} />
             </>
           )}
 

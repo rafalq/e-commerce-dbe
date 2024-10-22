@@ -19,17 +19,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function ButtonUser({ user }: Session) {
-  const { setTheme, theme } = useTheme();
+  const { setTheme, theme, resolvedTheme } = useTheme(); // Get resolvedTheme to check the system preference
   const [isChecked, setIsChecked] = useState(false);
 
   const router = useRouter();
 
   useEffect(() => {
     handleTheme();
-  }, []);
+  }, [resolvedTheme]); // Add resolvedTheme to trigger when the theme changes
 
   function handleCheckedChange(e: boolean) {
-    setIsChecked((curr) => !curr);
+    setIsChecked(e);
 
     if (e) {
       setTheme("dark");
@@ -39,15 +39,10 @@ export default function ButtonUser({ user }: Session) {
   }
 
   function handleTheme() {
-    switch (theme) {
-      case "dark":
-        return setIsChecked(true);
-      case "light":
-        return setIsChecked(false);
-      case "system":
-        return setIsChecked(false);
-      default:
-        return setIsChecked(false);
+    if (resolvedTheme === "dark") {
+      setIsChecked(true);
+    } else {
+      setIsChecked(false);
     }
   }
 
@@ -168,7 +163,7 @@ function ButtonTheme({ isChecked, onCheckedChange }: ButtonThemeProps) {
         }
         text="Theme"
       />
-      <Switch checked={isChecked} onCheckedChange={(e) => onCheckedChange(e)} />
+      <Switch checked={isChecked} onCheckedChange={onCheckedChange} />
     </div>
   );
 }

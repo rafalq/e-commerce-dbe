@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={cn(
-          "px-4 flex flex-col min-h-screen",
+          "flex flex-col min-h-screen",
           `${geistSans.variable} ${geistMono.variable} antialiased`
         )}
       >

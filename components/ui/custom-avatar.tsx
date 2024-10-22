@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from "../avatar";
+import { Avatar, AvatarFallback } from "./avatar";
 import Image from "next/image";
 
 type CustomAvatarProps =

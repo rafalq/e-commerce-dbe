@@ -1,5 +1,5 @@
 import FormSignUp from "@/app/auth/_components/form-sign-up";
-import ButtonBack from "@/components/ui/custom/button-back";
+import ButtonBack from "@/components/ui/custom-button-back";
 import { auth } from "@/server/auth";
 
 export default async function SignUpPage() {

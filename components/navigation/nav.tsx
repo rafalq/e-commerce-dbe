@@ -19,8 +19,8 @@ export default async function Nav() {
   }
 
   return (
-    <nav>
-      <ul className="flex justify-around items-center px-4 py-2">
+    <nav className="bg-primary/10">
+      <ul className="flex justify-around items-center px-4 py-4">
         <li>
           <Link href="/" aria-label="e-commerce dbe logo">
             <Logo text="E-commerce dbe" />

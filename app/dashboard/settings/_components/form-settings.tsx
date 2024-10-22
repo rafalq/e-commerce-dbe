@@ -6,11 +6,11 @@ import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import InputPassword from "@/components/ui/custom/input-password";
+import CustomInputPassword from "@/components/ui/custom-input-password";
 import {
-  NotificationError,
-  NotificationSuccess,
-} from "@/components/ui/custom/notifications";
+  CustomNotificationError,
+  CustomNotificationSuccess,
+} from "@/components/ui/custom-notifications";
 import {
   Form,
   FormControl,
@@ -217,7 +217,7 @@ export function FormSettings({ session }: FormSettings) {
                   </span>
                 </FormLabel>
                 <FormControl>
-                  <InputPassword
+                  <CustomInputPassword
                     {...field}
                     placeholder="&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;"
                     disabled={
@@ -243,7 +243,7 @@ export function FormSettings({ session }: FormSettings) {
                   </span>
                 </FormLabel>
                 <FormControl>
-                  <InputPassword
+                  <CustomInputPassword
                     {...field}
                     placeholder="&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;"
                     disabled={
@@ -293,8 +293,8 @@ export function FormSettings({ session }: FormSettings) {
         </>
         {showNotification && (
           <>
-            <NotificationSuccess message={success || ""} />
-            <NotificationError message={error} />
+            <CustomNotificationSuccess message={success || ""} />
+            <CustomNotificationError message={error} />
           </>
         )}
         <div className="flex flex-row-reverse mt-2">

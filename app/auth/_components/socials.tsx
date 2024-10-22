@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { CustomButton } from "@/components/ui/custom/custom-button";
+import { CustomButton } from "@/components/ui/custom-button";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 

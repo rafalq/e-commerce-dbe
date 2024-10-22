@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Socials from "./socials";
-import ButtonBack from "@/components/ui/custom/button-back";
+import ButtonBack from "@/components/ui/custom-button-back";
 
 type CardAuthProps = {
   cardTitle: string;

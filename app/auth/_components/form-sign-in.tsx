@@ -27,11 +27,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import FormWrapper from "@/app/auth/_components/form-wrapper";
-import InputPassword from "@/components/ui/custom/input-password";
+import CustomInputPassword from "@/components/ui/custom-input-password";
 import {
-  NotificationError,
-  NotificationSuccess,
-} from "@/components/ui/custom/notifications";
+  CustomNotificationError,
+  CustomNotificationSuccess,
+} from "@/components/ui/custom-notifications";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { IoIosSend } from "react-icons/io";
 
@@ -121,7 +121,7 @@ export default function FormSignIn() {
                     Password
                   </FormLabel>
                   <FormControl>
-                    <InputPassword
+                    <CustomInputPassword
                       {...field}
                       placeholder="&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;"
                       autoComplete="current-password"
@@ -174,8 +174,8 @@ export default function FormSignIn() {
 
           {showNotification && (
             <>
-              <NotificationSuccess message={success} />
-              <NotificationError message={error} />
+              <CustomNotificationSuccess message={success} />
+              <CustomNotificationError message={error} />
             </>
           )}
 

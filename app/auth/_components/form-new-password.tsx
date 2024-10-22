@@ -23,9 +23,9 @@ import type { FormAuthInput } from "@/types/form-auth";
 import { SchemaNewPassword } from "@/types/schema-new-password";
 import { IoIosSend } from "react-icons/io";
 import {
-  NotificationError,
-  NotificationSuccess,
-} from "@/components/ui/custom/notifications";
+  CustomNotificationError,
+  CustomNotificationSuccess,
+} from "@/components/ui/custom-notifications";
 import FormWrapper from "@/app/auth/_components/form-wrapper";
 import { useSearchParams } from "next/navigation";
 
@@ -128,8 +128,8 @@ export default function FormNewPassword() {
 
           {showNotification && (
             <>
-              <NotificationSuccess message={success} />
-              <NotificationError message={error} />
+              <CustomNotificationSuccess message={success} />
+              <CustomNotificationError message={error} />
             </>
           )}
 

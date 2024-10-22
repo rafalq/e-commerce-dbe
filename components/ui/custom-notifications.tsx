@@ -1,11 +1,13 @@
 import { IoMdAlert } from "react-icons/io";
 import { TiTick } from "react-icons/ti";
 
-type NotificationErrorProps = {
+type CustomNotificationErrorProps = {
   message?: string;
 };
 
-export function NotificationError({ message }: NotificationErrorProps) {
+export function CustomNotificationError({
+  message,
+}: CustomNotificationErrorProps) {
   if (!message) return null;
 
   return (
@@ -16,11 +18,13 @@ export function NotificationError({ message }: NotificationErrorProps) {
   );
 }
 
-type NotificationSuccessProps = {
+type CustomNotificationSuccessProps = {
   message?: string;
 };
 
-export function NotificationSuccess({ message }: NotificationSuccessProps) {
+export function CustomNotificationSuccess({
+  message,
+}: CustomNotificationSuccessProps) {
   if (!message) return null;
 
   return (
