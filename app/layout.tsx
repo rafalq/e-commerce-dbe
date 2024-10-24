@@ -1,9 +1,10 @@
+import Nav from "@/components/navigation/nav";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import CustomToaster from "@/components/ui/custom-toaster";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Nav from "@/components/navigation/nav";
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/providers/theme-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,8 +39,11 @@ export default function RootLayout({
           <header>
             <Nav />
           </header>
-          <main className="flex flex-col gap-4 px-2">{children}</main>
-          <footer className="mt-auto">FOOTER</footer>
+          <main className="flex flex-col gap-4 mx-auto py-4 w-full md:max-w-2xl">
+            {children}
+          </main>
+          <footer className="mt-auto p-4 text-center">FOOTER</footer>
+          <CustomToaster />
         </ThemeProvider>
       </body>
     </html>

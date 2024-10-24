@@ -1,16 +1,13 @@
 import FormSignIn from "@/app/auth/_components/form-sign-in";
-import ButtonBack from "@/components/ui/custom-button-back";
+import { Button } from "@/components/ui/button";
 import { auth } from "@/server/auth";
+import Link from "next/link";
 
 export default async function SignInPage() {
   const session = await auth();
 
   if (!session) {
-    return (
-      <div className="mx-auto p-4 w-full md:max-w-3xl">
-        <FormSignIn />
-      </div>
-    );
+    return <FormSignIn />;
   }
 
   return (
@@ -19,7 +16,11 @@ export default async function SignInPage() {
       <h4 className="font-medium text-lg">
         First you need to sign out to sign in or
       </h4>
-      <ButtonBack href="/" label="Go to Home page" />
+      <Button variant="link" className="font-semibold underline" asChild>
+        <Link aria-label="Go To Home" href="/">
+          Go To Home
+        </Link>
+      </Button>
     </div>
   );
 }

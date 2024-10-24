@@ -7,9 +7,5 @@ export default async function ProductCreate() {
 
   if (session?.user.role !== "admin") return redirect("/dashboard/settings");
 
-  return (
-    <div className="w-full md:max-w-2xl">
-      <FormCreateProduct />
-    </div>
-  );
+  return <FormCreateProduct />;
 }

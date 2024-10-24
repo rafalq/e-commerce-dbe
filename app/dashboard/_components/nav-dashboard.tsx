@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { DashboardLink } from "../_types";
 

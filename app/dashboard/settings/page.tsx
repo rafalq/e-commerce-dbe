@@ -1,6 +1,6 @@
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
-import CardSettings from "./_components/card-settings";
+import { FormSettings } from "./_components/form-settings";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -8,6 +8,6 @@ export default async function SettingsPage() {
   if (!session) {
     redirect("/");
   } else {
-    return <CardSettings session={session} />;
+    return <FormSettings session={session} />;
   }
 }

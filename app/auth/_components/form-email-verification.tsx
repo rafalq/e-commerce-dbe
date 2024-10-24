@@ -1,13 +1,12 @@
 "use client";
 
+import CustomButtonLink from "@/components/ui/custom-button-link";
+import CustomFormWrapper from "@/components/ui/custom-form-wrapper";
 import { verifyEmail } from "@/server/actions/tokens";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import CardAuth from "./card-auth";
-import {
-  CustomNotificationSuccess,
-  CustomNotificationError,
-} from "@/components/ui/custom-notifications";
+import { toast } from "sonner";
+
 export default function FormEmailVerification() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -20,16 +19,21 @@ export default function FormEmailVerification() {
     if (success || error) return;
 
     if (!token) {
-      setError("No token found.");
+      toast.error("No token found.");
       return;
     }
 
     verifyEmail(token).then((data) => {
+      toast.loading("Verification in progress...");
       if (data.status === "success") {
-        setSuccess(data.message || "Email verified successfully!");
+        setSuccess(data.message);
+        toast.dismiss();
+        toast.success(data.message || "Email verified successfully!");
         router.push("/auth/sign-in");
       } else if (data.status === "error") {
-        setError(data.message || "Something went wrong.");
+        setError(data.message);
+        toast.dismiss();
+        toast.error(data.message || "Something went wrong.");
       }
     });
   }, []);
@@ -39,16 +43,10 @@ export default function FormEmailVerification() {
   }, []);
 
   return (
-    <CardAuth
-      buttonBackLabel="Back To Login"
-      buttonBackHref="/auth/login"
-      cardTitle="Email Verification"
-    >
-      <div className="flex flex-col justify-center items-center p-6 w-full">
-        <p>{!success && !error && "Verification in progress..."}</p>
-        <CustomNotificationSuccess message={success} />
-        <CustomNotificationError message={error} />
+    <CustomFormWrapper title="Email Verification">
+      <div className="text-center">
+        <CustomButtonLink label="Back To Sign In?" href="/auth/sign-in" />
       </div>
-    </CardAuth>
+    </CustomFormWrapper>
   );
 }

@@ -22,7 +22,7 @@ export default function CustomFormWrapper({
 }: CustomFormWrapperProps) {
   return (
     <Card className="px-4 pt-2 w-full">
-      <CardHeader className="text-center">
+      <CardHeader className="pb-8 text-center">
         {title && (
           <CardTitle className="font-bold text-3xl sm:text-4xl tracking-tight">
             {title}

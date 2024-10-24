@@ -1,54 +1,20 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import CustomButtonSubmit from "@/components/ui/custom-button-submit";
+import CustomFormField from "@/components/ui/custom-form-field";
+import FormCard from "@/components/ui/custom-form-wrapper";
+import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { resetPassword } from "@/server/actions/reset-password";
+import { SchemaResetPassword } from "@/types/schema-reset-password";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { resetPassword } from "@/server/actions/reset-password";
-import type { FormAuthInput } from "@/types/form-auth";
-import { SchemaResetPassword } from "@/types/schema-reset-password";
-import { IoIosSend } from "react-icons/io";
-import {
-  CustomNotificationError,
-  CustomNotificationSuccess,
-} from "@/components/ui/custom-notifications";
-import FormWrapper from "@/app/auth/_components/form-wrapper";
-
-type InputName = {
-  name: "email";
-};
-
-type FormResetPasswordInput = FormAuthInput & InputName;
-
-const formResetPasswordInputs: FormResetPasswordInput[] = [
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "e-commerce-dbe@email.com",
-    autoComplete: "email",
-  },
-];
+import { toast } from "sonner";
+import * as z from "zod";
 
 export default function FormResetPassword() {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
-
   const form = useForm<z.infer<typeof SchemaResetPassword>>({
     resolver: zodResolver(SchemaResetPassword),
     defaultValues: {
@@ -57,16 +23,20 @@ export default function FormResetPassword() {
   });
 
   const { execute, status } = useAction(resetPassword, {
+    onExecute() {
+      toast.loading("Operation in progress...");
+    },
     onSuccess(data) {
-      setShowNotification(true);
-
-      if (data.data?.status === "success") {
-        setSuccess(data.data.message);
-      }
-
+      toast.dismiss();
       if (data.data?.status === "error") {
-        setError(data.data.message);
+        toast.error(data.data.message || "Something went wrong.");
+      } else if (data.data?.status === "success") {
+        toast.success(data.data.message || "Operation done successfully!");
       }
+    },
+    onError() {
+      toast.dismiss();
+      toast.error("Something went wrong.");
     },
   });
 
@@ -75,64 +45,30 @@ export default function FormResetPassword() {
   }
 
   return (
-    <FormWrapper
-      cardTitle="Reset Password"
-      buttonBackHref="/auth/sign-in"
-      buttonBackLabel="Back To Sign in"
-      showSocials={false}
-    >
+    <FormCard title="Reset Your Password">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4"
-        >
-          {formResetPasswordInputs.map((input) => (
-            <FormField
-              key={input.name}
-              control={form.control}
-              name={input.name}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{input?.label}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type={input.type}
-                      placeholder={input?.placeholder}
-                      autoComplete={input?.autoComplete}
-                      disabled={status === "executing"}
-                    />
-                  </FormControl>
-                  <FormDescription />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* ---- email input ---- */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <CustomFormField
+                label="Email"
+                description="Enter your email address and we will send you a link."
+              >
+                <Input disabled={status === "executing"} {...field} />
+              </CustomFormField>
+            )}
+          />
 
-          {showNotification && (
-            <>
-              <CustomNotificationSuccess message={success} />
-              <CustomNotificationError message={error} />
-            </>
-          )}
-
-          <div className="flex flex-row-reverse justify-between mt-2 mb-6">
-            <Button
-              onClick={() => setShowNotification(false)}
-              disabled={status === "executing"}
-              type="submit"
-              className={cn(
-                "px-8",
-                status === "executing" ? "animate-pulse" : null
-              )}
-            >
-              <p>{"Submit Request For New Password"}</p>{" "}
-              <IoIosSend className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
+          {/* ---- submit button ---- */}
+          <CustomButtonSubmit
+            disabled={status === "executing"}
+            className={cn(status === "executing" && "animate-pulse")}
+          />
         </form>
       </Form>
-    </FormWrapper>
+    </FormCard>
   );
 }

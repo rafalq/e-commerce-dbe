@@ -1,74 +1,23 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import CustomButtonLink from "@/components/ui/custom-button-link";
+import CustomButtonSubmit from "@/components/ui/custom-button-submit";
+import CustomFormField from "@/components/ui/custom-form-field";
+import FormCard from "@/components/ui/custom-form-wrapper";
+import CustomInputPassword from "@/components/ui/custom-input-password";
+import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { signUpEmail } from "@/server/actions/sign-up-email";
 import { SchemaSignUp } from "@/types/schema-sign-up";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction } from "next-safe-action/hooks";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { IoIosSend } from "react-icons/io";
-import { z } from "zod";
-
-import { signUpEmail } from "@/server/actions/sign-up-email";
-import type { FormAuthInput } from "@/types/form-auth";
-import {
-  CustomNotificationSuccess,
-  CustomNotificationError,
-} from "@/components/ui/custom-notifications";
-import FormWrapper from "@/app/auth/_components/form-wrapper";
-
-type InputName = {
-  name: "name" | "email" | "password" | "passwordConfirmation";
-};
-
-type FormSignUpProps = FormAuthInput & InputName;
-
-const formSignUpInputs: FormSignUpProps[] = [
-  {
-    name: "name",
-    label: "Name",
-    type: "text",
-    placeholder: "Bobby",
-  },
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "e-commerce-dbe@email.com",
-    autoComplete: "email",
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    placeholder: "**********",
-    autoComplete: "current-password",
-  },
-  {
-    name: "passwordConfirmation",
-    label: "Password Confirmation",
-    type: "password",
-    placeholder: "**********",
-    autoComplete: "current-password",
-  },
-];
+import { toast } from "sonner";
+import * as z from "zod";
+import SocialsAuth from "./socials-auth";
 
 export default function FormSignUp() {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
-
   const form = useForm({
     resolver: zodResolver(SchemaSignUp),
     defaultValues: {
@@ -80,13 +29,20 @@ export default function FormSignUp() {
   });
 
   const { execute, status } = useAction(signUpEmail, {
+    onExecute() {
+      toast.loading("Operation in progress...");
+    },
     onSuccess(data) {
-      setShowNotification(true);
+      toast.dismiss();
       if (data.data?.status === "error") {
-        setError(data.data.message || "");
+        toast.error(data.data.message || "Something went wrong.");
       } else if (data.data?.status === "success") {
-        setSuccess(data.data.message || "");
+        toast.success(data.data.message || "Operation done successfully!");
       }
+    },
+    onError() {
+      toast.dismiss();
+      toast.error("Something went wrong.");
     },
   });
 
@@ -95,61 +51,84 @@ export default function FormSignUp() {
   }
 
   return (
-    <FormWrapper
-      cardTitle="Create an account"
-      buttonBackHref="/auth/sign-in"
-      buttonBackLabel="Have an account?"
-      showSocials
-    >
+    <FormCard title="Sign Up">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4"
-        >
-          {formSignUpInputs.map((input) => (
-            <FormField
-              key={input.name}
-              control={form.control}
-              name={input.name}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{input?.label}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type={input.type}
-                      placeholder={input?.placeholder}
-                      autoComplete={input?.autoComplete}
-                    />
-                  </FormControl>
-                  <FormDescription />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* ---- name input ---- */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <CustomFormField label="Name">
+                <Input
+                  type="text"
+                  placeholder="Bobby"
+                  disabled={status === "executing"}
+                  {...field}
+                />
+              </CustomFormField>
+            )}
+          />
+          {/* ---- email input ---- */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <CustomFormField label="Email">
+                <Input
+                  type="email"
+                  placeholder="email@email.com"
+                  autoComplete="email"
+                  disabled={status === "executing"}
+                  {...field}
+                />
+              </CustomFormField>
+            )}
+          />
+          {/* ---- password input ---- */}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <CustomFormField label="Password">
+                <CustomInputPassword
+                  disabled={status === "executing"}
+                  {...field}
+                />
+              </CustomFormField>
+            )}
+          />
+          {/* ---- password confirmation input ---- */}
+          <FormField
+            control={form.control}
+            name="passwordConfirmation"
+            render={({ field }) => (
+              <CustomFormField
+                label="Password Confirmation"
+                description="Enter the same password as above."
+              >
+                <CustomInputPassword
+                  disabled={status === "executing"}
+                  {...field}
+                />
+              </CustomFormField>
+            )}
+          />
 
-          {showNotification && (
-            <>
-              <CustomNotificationSuccess message={success} />
-              <CustomNotificationError message={error} />
-            </>
-          )}
-
-          <div className="flex flex-row-reverse justify-between mt-2 mb-6">
-            <Button
-              onClick={() => setShowNotification(false)}
-              type="submit"
-              className={cn(
-                "px-8",
-                status === "executing" ? "animate-pulse" : null
-              )}
-            >
-              <p>{"Sign Up"}</p> <IoIosSend className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
+          {/* ---- submit button ---- */}
+          <CustomButtonSubmit
+            disabled={status === "executing"}
+            className={cn(status === "executing" && "animate-pulse")}
+          />
         </form>
       </Form>
-    </FormWrapper>
+      <div className="py-6">
+        <SocialsAuth />
+      </div>
+
+      <div className="text-center">
+        <CustomButtonLink label="Have an account?" href="/auth/sign-in" />
+      </div>
+    </FormCard>
   );
 }

@@ -9,7 +9,7 @@ import { auth } from "../auth";
 import { users } from "../schema";
 import { actionClient } from ".";
 
-export const settingsUpdate = actionClient
+export const updateSettings = actionClient
   .schema(SchemaSettings)
   .action(
     async ({

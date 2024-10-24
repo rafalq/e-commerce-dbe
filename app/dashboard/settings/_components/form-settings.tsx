@@ -1,47 +1,31 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import { UploadButton } from "@/app/api/uploadthing/_components";
+import CustomButtonSubmit from "@/components/ui/custom-button-submit";
+import CustomFormField from "@/components/ui/custom-form-field";
+import FormCard from "@/components/ui/custom-form-wrapper";
 import CustomInputPassword from "@/components/ui/custom-input-password";
-import {
-  CustomNotificationError,
-  CustomNotificationSuccess,
-} from "@/components/ui/custom-notifications";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { settingsUpdate } from "@/server/actions/settings-update";
+import { updateSettings } from "@/server/actions/update-settings";
 import { SchemaSettings } from "@/types/schema-settings";
-
+import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleAlert, LoaderCircle, Pen } from "lucide-react";
-import { useAction } from "next-safe-action/hooks";
-import { useEffect, useState } from "react";
-import { IoIosSend } from "react-icons/io";
-
 import type { Session } from "next-auth";
-import { UploadButton } from "@/app/api/uploadthing/_components";
+import { useAction } from "next-safe-action/hooks";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import * as z from "zod";
 
 type FormSettings = {
   session: Session;
 };
 
 export function FormSettings({ session }: FormSettings) {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showNotification, setShowNotification] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [isSubmitButtonBlocked, setIsSubmitButtonBlocked] = useState(true);
 
@@ -57,14 +41,25 @@ export function FormSettings({ session }: FormSettings) {
     },
   });
 
-  const { execute, status } = useAction(settingsUpdate, {
+  const { execute, status } = useAction(updateSettings, {
+    onExecute() {
+      toast.loading("Operation in progress...");
+    },
     onSuccess(data) {
-      setShowNotification(true);
+      toast.dismiss();
       if (data.data?.status === "error") {
-        setError(data.data.message || "Something went wrong.");
+        toast.error(data.data.message || "Something went wrong.");
       } else if (data.data?.status === "success") {
-        setSuccess(data.data.message || "Settings updated successfully!");
+        form.reset({
+          currentPassword: undefined,
+          newPassword: undefined,
+        });
+        toast.success(data.data.message || "Operation done successfully!");
       }
+    },
+    onError() {
+      toast.dismiss();
+      toast.error("Something went wrong.");
     },
   });
 
@@ -80,240 +75,175 @@ export function FormSettings({ session }: FormSettings) {
     execute(parsedInput);
   }
 
-  function clearNotifications() {
-    setShowNotification(false);
-    setError("");
-    setSuccess("");
-  }
-
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6"
-      >
-        <div className="flex justify-between">
-          {/* --- avatar input --- */}
-          <FormField
-            control={form.control}
-            name="image"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold">Avatar</FormLabel>
-                <div className="flex items-center">
-                  {!form.getValues("image") && (
-                    <div className="font-bold">
-                      {session.user?.name?.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  {form.getValues("image") && (
-                    <Image
-                      src={form.getValues("image")!}
-                      width={42}
-                      height={42}
-                      className="rounded-full"
-                      alt="User Image"
+    <FormCard
+      title="Settings"
+      footer={
+        <p className="flex gap-2">
+          <CircleAlert className="w-4 h-4 text-red-700" />
+          <span className="text-sm">
+            Settings disabled when using social authentication.
+          </span>
+        </p>
+      }
+    >
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="flex justify-between">
+            {/* ---- avatar input ---- */}
+            <FormField
+              control={form.control}
+              name="image"
+              render={() => (
+                <CustomFormField label="Avatar">
+                  <div className="flex items-center">
+                    {!form.getValues("image") && (
+                      <div className="font-bold">
+                        {session.user?.name?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    {form.getValues("image") && (
+                      <Image
+                        src={form.getValues("image")!}
+                        width={42}
+                        height={42}
+                        className="rounded-full"
+                        alt="User Image"
+                      />
+                    )}
+                    <UploadButton
+                      className="ut-button:-top-12 ut-button:absolute ut-allowed-content:hidden ut-label:hidden hover:ut-button:bg-primary/40 ut-button:bg-primary/30 ut-label:bg-red-50 ut-button:p-2 ut-button:rounded-full ut-button:ring-primary ut-button:w-auto ut-button:h-auto ut-button:font-semibold ut:button:transition-all ut-button:duration-500 scale-50"
+                      endpoint="avatarUploader"
+                      onUploadBegin={() => {
+                        setAvatarUploading(true);
+                      }}
+                      onUploadError={(error) => {
+                        form.setError("image", {
+                          type: "validate",
+                          message: error.message,
+                        });
+                        setAvatarUploading(false);
+                        return;
+                      }}
+                      onClientUploadComplete={(res) => {
+                        form.setValue("image", res[0].url!);
+                        setAvatarUploading(false);
+                        return;
+                      }}
+                      content={{
+                        button({ ready }) {
+                          if (ready) return <Pen />;
+                          return <LoaderCircle className="animate-spin" />;
+                        },
+                      }}
                     />
-                  )}
-                  <UploadButton
-                    className="ut-button:-top-12 ut-button:absolute ut-allowed-content:hidden ut-label:hidden hover:ut-button:bg-primary/40 ut-button:bg-primary/30 ut-label:bg-red-50 ut-button:p-2 ut-button:rounded-full ut-button:ring-primary ut-button:w-auto ut-button:h-auto ut-button:font-semibold ut:button:transition-all ut-button:duration-500 scale-50"
-                    endpoint="avatarUploader"
-                    onUploadBegin={() => {
-                      setAvatarUploading(true);
-                    }}
-                    onUploadError={(error) => {
-                      form.setError("image", {
-                        type: "validate",
-                        message: error.message,
-                      });
-                      setAvatarUploading(false);
-                      return;
-                    }}
-                    onClientUploadComplete={(res) => {
-                      form.setValue("image", res[0].url!);
-                      setAvatarUploading(false);
-                      return;
-                    }}
-                    content={{
-                      button({ ready }) {
-                        if (ready) return <Pen />;
-                        return <LoaderCircle className="animate-spin" />;
-                      },
-                    }}
-                  />
-                </div>
-                <FormControl>
+                  </div>
+                </CustomFormField>
+              )}
+            />
+            {/* ---- name input ---- */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <CustomFormField label="Name">
                   <Input
-                    {...field}
-                    placeholder="User Image"
-                    type="hidden"
+                    type="text"
+                    autoComplete="email"
                     disabled={status === "executing"}
-                  />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* --- name input --- */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold">Name</FormLabel>
-                <FormControl>
-                  <Input
+                    className="sm:min-w-72"
                     {...field}
-                    placeholder="Bobby"
-                    disabled={status === "executing"}
-                    className="min-w-60"
                   />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <>
-          {/* --- email input --- */}
+                </CustomFormField>
+              )}
+            />
+          </div>
+          {/* ---- email input ---- */}
           <FormField
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex gap-2 font-semibold">
-                  Email{" "}
-                  <span>
-                    <CircleAlert className="w-3 h-3 text-red-700" />
-                  </span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="bobby@email.com"
-                    disabled={
-                      status === "executing" || !!session.user.isOAuth === true
-                    }
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
+              <CustomFormField label="Email" alertLabel>
+                <Input
+                  type="email"
+                  autoComplete="email"
+                  disabled={
+                    status === "executing" || !!session.user.isOAuth === true
+                  }
+                  {...field}
+                />
+              </CustomFormField>
             )}
           />
-          {/* --- current password input --- */}
+          {/* ---- current password input ---- */}
           <FormField
             control={form.control}
             name="currentPassword"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex gap-2 font-semibold">
-                  Current Password
-                  <span>
-                    <CircleAlert className="w-3 h-3 text-red-700" />
-                  </span>
-                </FormLabel>
-                <FormControl>
-                  <CustomInputPassword
-                    {...field}
-                    placeholder="&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;"
-                    disabled={
-                      status === "executing" || !!session.user.isOAuth === true
-                    }
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
+              <CustomFormField label="Current Password" alertLabel>
+                <CustomInputPassword
+                  disabled={
+                    status === "executing" || !!session.user.isOAuth === true
+                  }
+                  {...field}
+                />
+              </CustomFormField>
             )}
           />
-          {/* --- new password input --- */}
+          {/* ---- new password input ---- */}
           <FormField
             control={form.control}
             name="newPassword"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex gap-2 font-semibold">
-                  New Password
-                  <span>
-                    <CircleAlert className="w-3 h-3 text-red-700" />
-                  </span>
-                </FormLabel>
-                <FormControl>
-                  <CustomInputPassword
-                    {...field}
-                    placeholder="&middot;&middot;&middot;&middot;&middot;&middot;&middot;&middot;"
-                    disabled={
-                      status === "executing" || !!session.user.isOAuth === true
-                    }
-                  />
-                </FormControl>
-                <FormDescription />
-                <FormMessage />
-              </FormItem>
+              <CustomFormField
+                label="New Password"
+                alertLabel
+                description="Must be different than your current password."
+              >
+                <CustomInputPassword
+                  disabled={
+                    status === "executing" || !!session.user.isOAuth === true
+                  }
+                  {...field}
+                />
+              </CustomFormField>
             )}
           />
+
           {/* --- enable two factor auth input --- */}
           <FormField
             control={form.control}
             name="isTwoFactorEnabled"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="flex gap-2 font-semibold">
-                  Two Factor Authentication{" "}
-                  <span>
-                    <CircleAlert className="w-3 h-3 text-red-700" />
-                  </span>
-                </FormLabel>
-                <FormDescription className="text-xs">
-                  Enable Two Factor Authentication for your account that,
-                  <br />
+              <CustomFormField
+                label="Two Factor Authentication"
+                alertLabel
+                description="Enable Two Factor Authentication for your account that, \n
                   in addition to the password, requires a code sent to your
-                  email.
-                </FormDescription>
-                <FormControl>
-                  <span className="flex items-center">
-                    <Switch
-                      onCheckedChange={field.onChange}
-                      checked={field.value}
-                      disabled={
-                        status === "executing" ||
-                        !!session.user.isOAuth === true
-                      }
-                    />
-                  </span>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                  email."
+              >
+                <span className="flex items-center">
+                  <Switch
+                    onCheckedChange={field.onChange}
+                    checked={field.value}
+                    disabled={
+                      status === "executing" || !!session.user.isOAuth === true
+                    }
+                  />
+                </span>
+              </CustomFormField>
             )}
           />
-        </>
-        {showNotification && (
-          <>
-            <CustomNotificationSuccess message={success || ""} />
-            <CustomNotificationError message={error} />
-          </>
-        )}
-        <div className="flex flex-row-reverse mt-2">
-          <Button
-            onClick={clearNotifications}
-            type="submit"
+
+          {/* ---- submit button ---- */}
+          <CustomButtonSubmit
             disabled={
               status === "executing" || avatarUploading || isSubmitButtonBlocked
             }
-            className={cn(
-              `px-8 bg-primary`,
-
-              status === "executing" ? "animate-pulse" : null
-            )}
-          >
-            <p>{"Update Settings"}</p> <IoIosSend className="ml-2 w-5 h-5" />
-          </Button>
-        </div>
-      </form>
-    </Form>
+            className={cn(status === "executing" && "animate-pulse")}
+          />
+        </form>
+      </Form>
+    </FormCard>
   );
 }

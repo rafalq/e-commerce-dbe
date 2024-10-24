@@ -1,15 +1,20 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import CustomButtonSubmit from "@/components/ui/custom-button-submit";
 import CustomFormField from "@/components/ui/custom-form-field";
 import FormCard from "@/components/ui/custom-form-wrapper";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Tiptap from "@/components/ui/tiptap";
+import { cn } from "@/lib/utils";
+import { createProduct } from "@/server/actions/create-product";
 import { SchemaProduct } from "@/types/schema-product";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DollarSign, PackagePlus } from "lucide-react";
+import { DollarSign } from "lucide-react";
+import { useAction } from "next-safe-action/hooks";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import * as z from "zod";
 
 export default function FormCreateProduct() {
@@ -23,8 +28,29 @@ export default function FormCreateProduct() {
     mode: "onChange",
   });
 
-  function onSubmit() {
-    // execute(parsedInput);
+  const router = useRouter();
+
+  const { execute, status } = useAction(createProduct, {
+    onExecute() {
+      toast.loading("Operation in progress...");
+    },
+    onSuccess(data) {
+      toast.dismiss();
+      if (data.data?.status === "error") {
+        toast.error(data.data.message || "Something went wrong.");
+      } else if (data.data?.status === "success") {
+        router.push("/dashboard/products");
+        toast.success(data.data.message || "Operation done successfully!");
+      }
+    },
+    onError() {
+      toast.dismiss();
+      toast.error("Something went wrong.");
+    },
+  });
+
+  function onSubmit(parsedInput: z.infer<typeof SchemaProduct>) {
+    execute(parsedInput);
   }
 
   return (
@@ -40,7 +66,7 @@ export default function FormCreateProduct() {
                 label="Product Title"
                 description="This is a public product display name."
               >
-                <Input {...field} />
+                <Input disabled={status === "executing"} {...field} />
               </CustomFormField>
             )}
           />
@@ -73,22 +99,24 @@ export default function FormCreateProduct() {
                     type="number"
                     min={0}
                     step={0.01}
-                    placeholder="999.99"
+                    placeholder="999,99"
+                    disabled={status === "executing"}
                     className="max-w-32"
                   />
                 </div>
               </CustomFormField>
             )}
           />
+
           {/* ---- submit button ---- */}
-          <div className="block sm:flex sm:flex-row-reverse">
-            <Button type="submit" className="mt-6">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold uppercase">submit</p>
-                <PackagePlus className="w-4 h-4" />
-              </div>
-            </Button>
-          </div>
+          <CustomButtonSubmit
+            disabled={
+              status === "executing" ||
+              !form.formState.isValid ||
+              !form.formState.isDirty
+            }
+            className={cn(status === "executing" && "animate-pulse")}
+          />
         </form>
       </Form>
     </FormCard>
