@@ -51,12 +51,12 @@ export const updateSettings = actionClient
           if (currentPassword && newPassword) {
             const passwordMatch = await bcrypt.compare(
               currentPassword,
-              user.password
+              user.password as string
             );
 
             const passwordSame = await bcrypt.compare(
               newPassword,
-              user.password
+              user.password as string
             );
 
             if (!passwordMatch)

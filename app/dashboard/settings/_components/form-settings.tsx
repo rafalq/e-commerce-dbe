@@ -32,12 +32,12 @@ export function FormSettings({ session }: FormSettings) {
   const form = useForm({
     resolver: zodResolver(SchemaSettings),
     defaultValues: {
-      name: session?.user?.name || undefined,
-      image: session.user.image || undefined,
-      email: session?.user?.email || undefined,
-      currentPassword: undefined,
-      newPassword: undefined,
-      isTwoFactorEnabled: session?.user?.isTwoFactorEnabled || undefined,
+      name: session?.user?.name || "",
+      image: session.user.image || "",
+      email: session?.user?.email || "",
+      currentPassword: "",
+      newPassword: "",
+      isTwoFactorEnabled: session?.user?.isTwoFactorEnabled || false,
     },
   });
 
@@ -47,14 +47,15 @@ export function FormSettings({ session }: FormSettings) {
     },
     onSuccess(data) {
       toast.dismiss();
+
       if (data.data?.status === "error") {
         toast.error(data.data.message || "Something went wrong.");
       } else if (data.data?.status === "success") {
-        form.reset({
-          currentPassword: undefined,
-          newPassword: undefined,
-        });
+        // Show success message
         toast.success(data.data.message || "Operation done successfully!");
+
+        form.resetField("currentPassword");
+        form.resetField("newPassword");
       }
     },
     onError() {
