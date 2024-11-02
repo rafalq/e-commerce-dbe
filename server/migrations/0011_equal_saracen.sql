@@ -1,0 +1,1 @@
+ALTER TABLE "productVariantTypes" ADD COLUMN "updated" timestamp DEFAULT now();

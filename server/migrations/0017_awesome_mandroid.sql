@@ -1,0 +1,2 @@
+ALTER TABLE "productsToProductVariants" ALTER COLUMN "productId" SET DATA TYPE serial;--> statement-breakpoint
+ALTER TABLE "productsToProductVariants" ALTER COLUMN "productVariantId" SET DATA TYPE serial;

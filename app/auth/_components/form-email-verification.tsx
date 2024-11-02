@@ -1,7 +1,7 @@
 "use client";
 
 import CustomButtonLink from "@/components/ui/custom-button-link";
-import CustomFormWrapper from "@/components/ui/custom-form-wrapper";
+import CustomCardWrapper from "@/components/ui/custom-card-wrapper";
 import { verifyEmail } from "@/server/actions/tokens";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -43,10 +43,10 @@ export default function FormEmailVerification() {
   }, []);
 
   return (
-    <CustomFormWrapper title="Email Verification">
+    <CustomCardWrapper title="Email Verification">
       <div className="text-center">
         <CustomButtonLink label="Back To Sign In?" href="/auth/sign-in" />
       </div>
-    </CustomFormWrapper>
+    </CustomCardWrapper>
   );
 }

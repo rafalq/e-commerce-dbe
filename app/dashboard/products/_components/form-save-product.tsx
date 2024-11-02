@@ -2,22 +2,29 @@
 
 import CustomButtonSubmit from "@/components/ui/custom-button-submit";
 import CustomFormField from "@/components/ui/custom-form-field";
-import FormCard from "@/components/ui/custom-form-wrapper";
+import FormCard from "@/components/ui/custom-card-wrapper";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Tiptap from "@/components/ui/tiptap";
 import { cn } from "@/lib/utils";
-import { createProduct } from "@/server/actions/create-product";
+import { getProduct } from "@/server/actions/get-product";
+import { saveProduct } from "@/server/actions/save-product";
 import { SchemaProduct } from "@/types/schema-product";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
 
-export default function FormCreateProduct() {
+type TiptapRef = {
+  clearContent: () => void;
+};
+
+export default function FormSaveProduct() {
+  const tiptapRef = useRef<TiptapRef | null>(null);
   const form = useForm<z.infer<typeof SchemaProduct>>({
     resolver: zodResolver(SchemaProduct),
     defaultValues: {
@@ -30,7 +37,38 @@ export default function FormCreateProduct() {
 
   const router = useRouter();
 
-  const { execute, status } = useAction(createProduct, {
+  // ---- edit mode
+  const searchParams = useSearchParams();
+  const editMode = searchParams.get("id");
+
+  useEffect(() => {
+    if (editMode) {
+      findProduct(parseInt(editMode));
+    } else {
+      form.reset();
+      tiptapRef.current?.clearContent();
+    }
+  }, [editMode]);
+
+  async function findProduct(id: number) {
+    if (editMode) {
+      const { status, message, data: product } = await getProduct(id);
+
+      if (status === "error") {
+        toast.error(message);
+        router.push("/dashboard/products");
+        return;
+      } else if (status === "success" && product) {
+        const id = parseInt(editMode);
+        form.setValue("title", product.title);
+        form.setValue("description", product.description);
+        form.setValue("price", product.price);
+        form.setValue("id", id);
+      }
+    }
+  }
+
+  const { execute, status } = useAction(saveProduct, {
     onExecute() {
       toast.loading("Operation in progress...");
     },
@@ -54,7 +92,14 @@ export default function FormCreateProduct() {
   }
 
   return (
-    <FormCard title="Create Product">
+    <FormCard
+      title={editMode ? "Update Product" : "Create Product"}
+      description={
+        editMode
+          ? 'To exit "Edit Mode" and enter "Create Mode" click "Save " icon from above.'
+          : undefined
+      }
+    >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {/* ---- title input ---- */}
@@ -79,7 +124,7 @@ export default function FormCreateProduct() {
                 label="Product Description"
                 description="Use the option buttons below to format your description text."
               >
-                <Tiptap val={field.value} />
+                <Tiptap ref={tiptapRef} val={field.value} />
               </CustomFormField>
             )}
           />
@@ -110,11 +155,7 @@ export default function FormCreateProduct() {
 
           {/* ---- submit button ---- */}
           <CustomButtonSubmit
-            disabled={
-              status === "executing" ||
-              !form.formState.isValid ||
-              !form.formState.isDirty
-            }
+            disabled={status === "executing" || !form.formState.isValid}
             className={cn(status === "executing" && "animate-pulse")}
           />
         </form>

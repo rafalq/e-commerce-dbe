@@ -7,11 +7,12 @@ import { eq } from "drizzle-orm";
 import { products } from "../schema";
 import { revalidatePath } from "next/cache";
 
-export const createProduct = actionClient
+export const saveProduct = actionClient
   .schema(SchemaProduct)
   .action(async ({ parsedInput: { id, title, description, price } }) => {
     try {
-      // --- check if it is 'edit mode'
+      // --- check if 'edit mode'
+
       if (id) {
         const currentProduct = await db.query.products.findFirst({
           where: eq(products.id, id),
@@ -20,7 +21,8 @@ export const createProduct = actionClient
         if (!currentProduct)
           return { status: "error", message: "Product not found." };
 
-        // --- if so, then update the product
+        // --- if so, update the product
+
         const editedProduct = await db
           .update(products)
           .set({ description, price, title })
@@ -31,9 +33,10 @@ export const createProduct = actionClient
 
         return {
           status: "success",
-          message: `Product "${editedProduct[0].title}" has been edited.`,
+          message: `Product "${editedProduct[0].title}" updated successfully!`,
         };
-        // --- 'create mode'
+
+        // --- if not, create product
       } else {
         const newProduct = await db
           .insert(products)
@@ -44,11 +47,11 @@ export const createProduct = actionClient
 
         return {
           status: "success",
-          message: `Product "${newProduct[0].title}" has been created`,
+          message: `Product "${newProduct[0].title}" created successfully!`,
         };
       }
     } catch (error) {
       console.error(error);
-      return { status: "error", message: "Failed to create product" };
+      return { status: "error", message: "Failed to save product." };
     }
   });

@@ -4,13 +4,14 @@ import { Toggle } from "@/components/ui/toggle";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Bold, Italic, List, ListOrdered, Strikethrough } from "lucide-react";
-import { useEffect } from "react";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { useFormContext } from "react-hook-form";
 import { Placeholder } from "@tiptap/extension-placeholder";
 
-const Tiptap = ({ val }: { val: string }) => {
+const Tiptap = forwardRef(({ val }: { val: string }, ref) => {
   const { setValue } = useFormContext();
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       Placeholder.configure({
         placeholder: "This is a description of a new product.",
@@ -49,8 +50,14 @@ const Tiptap = ({ val }: { val: string }) => {
   });
 
   useEffect(() => {
-    if (editor?.isEmpty) editor.commands.setContent(val);
+    if (editor?.isEmpty) {
+      editor.commands.setContent(val);
+    }
   }, [val]);
+
+  useImperativeHandle(ref, () => ({
+    clearContent: () => editor?.commands.clearContent(),
+  }));
 
   return (
     <div className="flex flex-col gap-2">
@@ -102,9 +109,11 @@ const Tiptap = ({ val }: { val: string }) => {
           </Toggle>
         </div>
       )}
-      <EditorContent placeholder="heyy" editor={editor} />
+      <EditorContent editor={editor} />
     </div>
   );
-};
+});
+
+Tiptap.displayName = "Tiptap";
 
 export default Tiptap;

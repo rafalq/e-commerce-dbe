@@ -11,12 +11,12 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
-import { LogOut, Moon, Settings, Sun, Truck } from "lucide-react";
+import { LoaderCircle, LogOut, Moon, Settings, Sun, Truck } from "lucide-react";
 import { Session } from "next-auth";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function ButtonUser({ user }: Session) {
   const { setTheme, theme, resolvedTheme } = useTheme(); // Get resolvedTheme to check the system preference
@@ -50,15 +50,19 @@ export default function ButtonUser({ user }: Session) {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger>
         <Avatar>
-          {user?.image ? (
-            <Image src={user.image} alt={user.name || "user avatar"} fill />
-          ) : (
-            <AvatarFallback>
-              <p className="font-bold text-primary dark:text-primary">
-                {user?.name?.charAt(0).toUpperCase()}
-              </p>
-            </AvatarFallback>
-          )}
+          <Suspense
+            fallback={<LoaderCircle className="w-6 h-6 animate-spin" />}
+          >
+            {user?.image ? (
+              <Image src={user.image} alt={user.name || "user avatar"} fill />
+            ) : (
+              <AvatarFallback>
+                <p className="font-bold text-primary dark:text-primary">
+                  {user?.name?.charAt(0).toUpperCase()}
+                </p>
+              </AvatarFallback>
+            )}
+          </Suspense>
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent

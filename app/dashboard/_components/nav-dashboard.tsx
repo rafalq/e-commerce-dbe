@@ -26,14 +26,14 @@ export default function NavDashboard({ links }: NavDashboardProps) {
                 )}
               >
                 {icon}
-                <span className="font-bold text-xs">{label}</span>
+                <span className="font-semibold text-xs">{label}</span>
                 {pathname === path ? (
                   <motion.div
                     layoutId="underline"
                     initial={{ scale: 0.5 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
-                    className="-bottom-1.5 absolute bg-primary rounded-full w-full h-[4px]"
+                    className="-bottom-1.5 absolute bg-primary rounded-full w-full h-[2.5px]"
                   />
                 ) : null}
               </Link>

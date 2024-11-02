@@ -24,6 +24,7 @@ export const updateSettings = actionClient
     }) => {
       try {
         const session = await auth();
+        let updatedUserDetails = null;
 
         if (!session) return { status: "error", message: "User not found." };
 
@@ -40,12 +41,11 @@ export const updateSettings = actionClient
           isTwoFactorEnabled = undefined;
         }
 
-        if (newPassword) {
+        if (newPassword !== undefined && newPassword?.trim().length > 0) {
           if (!currentPassword) {
             return {
               status: "error",
-              message:
-                "Confirm your current password to change for a new password.",
+              message: "Confirm your current password.",
             };
           }
           if (currentPassword && newPassword) {
@@ -62,31 +62,43 @@ export const updateSettings = actionClient
             if (!passwordMatch)
               return {
                 status: "error",
-                message: "Current Password incorrect.",
+                message: "Current password incorrect.",
               };
 
             if (passwordSame)
               return {
                 status: "error",
-                message: "New password is the same as the old password.",
+                message: "New password is the same as the current password.",
               };
           }
 
           currentPassword = await bcrypt.hash(newPassword, 10);
           newPassword = undefined;
-        }
 
-        const updatedUserDetails = await db
-          .update(users)
-          .set({
-            name,
-            email,
-            image,
-            password: currentPassword,
-            twoFactorEnabled: isTwoFactorEnabled,
-          })
-          .where(eq(users.id, user.id))
-          .returning();
+          updatedUserDetails = await db
+            .update(users)
+            .set({
+              name,
+              email,
+              image,
+              password: currentPassword,
+              twoFactorEnabled: isTwoFactorEnabled,
+            })
+            .where(eq(users.id, user.id))
+            .returning();
+        } else {
+          updatedUserDetails = await db
+            .update(users)
+            .set({
+              name,
+              email,
+              image,
+              password: user.password,
+              twoFactorEnabled: isTwoFactorEnabled,
+            })
+            .where(eq(users.id, user.id))
+            .returning();
+        }
 
         revalidatePath("/dashboard/settings");
 

@@ -1,20 +1,17 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Pencil, Trash } from "lucide-react";
+import { PlusCircle } from "lucide-react";
+import Image from "next/image";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import CustomTooltip from "@/components/ui/custom-tooltip";
+import { ColumnDef } from "@tanstack/react-table";
+
+import ProductVariant from "./product-variant";
+import TableActions from "./table-actions";
 
 import type { ProductColumn } from "@/app/dashboard/products/_types/product-column";
-import Image from "next/image";
+import type { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
+import FormProductVariant from "./form-product-variant";
 
 export const columns: ColumnDef<ProductColumn>[] = [
   { accessorKey: "id", header: "Id" },
@@ -26,7 +23,46 @@ export const columns: ColumnDef<ProductColumn>[] = [
       return <div className="font-semibold tracking-wider">{title}</div>;
     },
   },
-  { accessorKey: "variants", header: "Variants" },
+  {
+    accessorKey: "variants",
+    header: "Variants",
+    cell: ({ row }) => {
+      const variants = row.getValue("variants") as VariantsWithImagesTags[];
+
+      return (
+        <div className="flex justify-center items-center gap-2">
+          {variants.map((variant) => (
+            <div key={variant.id}>
+              <CustomTooltip text={variant.productType}>
+                <ProductVariant
+                  productId={variant.productId}
+                  variant={variant}
+                  editMode={true}
+                >
+                  <div
+                    key={variant.id}
+                    className="rounded-full w-5 h-5"
+                    style={{ background: variant.variantValue }}
+                  />
+                </ProductVariant>
+              </CustomTooltip>
+            </div>
+          ))}
+          <CustomTooltip text="Add new variant">
+            <ProductVariant
+              productId={row.original.id}
+              editMode={false}
+              triggerButtonContent={
+                <PlusCircle className="w-4 h-4 cursor-pointer" />
+              }
+            >
+              <FormProductVariant editMode={false} />
+            </ProductVariant>
+          </CustomTooltip>
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "price",
     header: "Price",
@@ -54,27 +90,11 @@ export const columns: ColumnDef<ProductColumn>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
-      const product = row.original;
-
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="p-0 w-8 h-8">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="w-4 h-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="center">
-            <DropdownMenuItem className="flex justify-start items-center gap-2 focus:bg-primary/30 dark:focus:bg-primary text-primary text-xs focus:text-primary-foreground">
-              <Pencil className="w-3 h-3" />
-              Edit Product
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex justify-start items-center gap-2 dark:focus:bg-destructive focus:bg-destructive/30 text-xs">
-              <Trash className="w-3 h-3" />
-              Delete Product
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <TableActions
+          productId={row.getValue("id")}
+          productTitle={row.getValue("title")}
+        />
       );
     },
   },

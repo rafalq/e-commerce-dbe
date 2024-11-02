@@ -3,7 +3,7 @@
 import CustomButtonLink from "@/components/ui/custom-button-link";
 import CustomButtonSubmit from "@/components/ui/custom-button-submit";
 import CustomFormField from "@/components/ui/custom-form-field";
-import FormCard from "@/components/ui/custom-form-wrapper";
+import FormCard from "@/components/ui/custom-card-wrapper";
 import CustomInputPassword from "@/components/ui/custom-input-password";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";

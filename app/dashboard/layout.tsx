@@ -1,5 +1,5 @@
 import { auth } from "@/server/auth";
-import { BarChart, Boxes, PackagePlus, Settings, Truck } from "lucide-react";
+import { BarChart, Boxes, FileBox, Settings, Truck } from "lucide-react";
 import NavDashboard from "./_components/nav-dashboard";
 
 export default async function DashboardLayout({
@@ -36,9 +36,9 @@ export default async function DashboardLayout({
             icon: <Boxes size={16} />,
           },
           {
-            label: "Create",
-            path: "/dashboard/products/create",
-            icon: <PackagePlus size={16} />,
+            label: "Save",
+            path: "/dashboard/products/save",
+            icon: <FileBox size={16} />,
           },
         ]
       : [];

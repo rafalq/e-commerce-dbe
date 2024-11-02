@@ -7,19 +7,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-type CustomFormWrapperProps = {
+type CustomCardWrapperProps = {
   title?: string;
   description?: string;
   children?: React.ReactNode;
   footer?: JSX.Element;
 };
 
-export default function CustomFormWrapper({
+export default function CustomCardWrapper({
   title,
   description,
   children,
   footer,
-}: CustomFormWrapperProps) {
+}: CustomCardWrapperProps) {
   return (
     <Card className="px-4 pt-2 w-full">
       <CardHeader className="pb-8 text-center">
@@ -29,7 +29,7 @@ export default function CustomFormWrapper({
           </CardTitle>
         )}
         {description && (
-          <CardDescription className="mt-2 text-lg leading-8">
+          <CardDescription className="mt-2 text-sm leading-8">
             {description}
           </CardDescription>
         )}
