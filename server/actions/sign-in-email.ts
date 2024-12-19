@@ -14,9 +14,27 @@ import {
   getTwoFactorTokenByEmail,
 } from "@/server/actions/tokens";
 import { signIn } from "@/server/auth";
-import type { FormStatus } from "@/types/form-status";
+import type { TypeApiResponse } from "@/types/type-api-response";
 import { AuthError } from "next-auth";
 import { sendTwoFactorTokenToEmail } from "./send-two-factor-token-to-email";
+
+export async function handleTwoFactorToken(
+  email: string,
+  apiResponse: TypeApiResponse
+): Promise<TypeApiResponse> {
+  const token = await generateTwoFactorToken(email);
+
+  if (!token) {
+    return { status: ["error"], message: "Code not generated" };
+  }
+
+  await sendTwoFactorTokenToEmail(
+    token[0].email,
+    token[0].token,
+    "E-commerce DBE Two Factor Authentication Confirmation"
+  );
+  return apiResponse;
+}
 
 export const signInEmail = actionClient
   .schema(SchemaSignIn)
@@ -30,18 +48,20 @@ export const signInEmail = actionClient
       // user not in database!
       if (!existingUser || existingUser?.email !== email) {
         return {
-          status: "error",
-          message: "Wrong email or password.",
-        } as FormStatus;
+          status: ["error"],
+          message: "Wrong email or password",
+        };
       }
 
+      let passwordMatch;
+
       // is password correct?
-      const passwordMatch = await bcrypt.compare(
-        password,
-        existingUser.password
-      );
+      if (existingUser.password) {
+        passwordMatch = await bcrypt.compare(password, existingUser.password);
+      }
+
       if (!passwordMatch)
-        return { status: "error", message: "Wrong email or password." };
+        return { status: ["error"], message: "Wrong email or password" };
 
       // is user's email verified?
       if (!existingUser.emailVerified) {
@@ -53,52 +73,59 @@ export const signInEmail = actionClient
           verificationToken[0].token,
           "/auth/email-verification",
           "E-commerce DBE Email Confirmation",
-          "to confirm your email."
+          "to confirm your email"
         );
 
         return {
-          status: "success",
-          message: "Verification token sent to your email.",
-        } as FormStatus;
+          status: ["success"],
+          message: "Verification code was sent to your email",
+        };
       }
 
       // is two factor auth enabled?
       if (existingUser.twoFactorEnabled) {
-        if (code) {
-          const twoFactorToken = await getTwoFactorTokenByEmail(
-            existingUser.email
-          );
+        // Check if a token already exists for the user
+        const existingToken = await getTwoFactorTokenByEmail(
+          existingUser.email
+        );
 
-          // no token in db? or token different than typed code
-          if (!twoFactorToken || twoFactorToken.token !== code)
-            return { status: "error", message: "Token invalid." };
+        if (existingToken) {
+          // If a token exists, check if the user provided a code
+          if (code) {
+            // Validate the provided code
+            if (existingToken.token !== code) {
+              return {
+                status: ["two-factor", "error"],
+                message: "Code is incorrect",
+              };
+            }
 
-          // token expired?
-          const hasExpired = new Date(twoFactorToken.expires) < new Date();
-          if (hasExpired)
-            return { status: "error", message: "Token has expired." };
+            // Check if the token has expired
+            const hasExpired = new Date(existingToken.expires) < new Date();
+            if (hasExpired) {
+              return await handleTwoFactorToken(existingUser.email, {
+                status: ["two-factor", "warning"],
+                message: "Code has expired. New code was sent to your email",
+              });
+            }
 
-          // delete the token
-          await db
-            .delete(twoFactorTokens)
-            .where(eq(twoFactorTokens.id, twoFactorToken.id));
-        } else {
-          const token = await generateTwoFactorToken(existingUser.email);
-
-          if (!token) {
-            return { status: "error", message: "Token not generated." };
+            // Code is valid and not expired, delete the token
+            await db
+              .delete(twoFactorTokens)
+              .where(eq(twoFactorTokens.id, existingToken.id));
+          } else {
+            // If no code was provided, notify the user to check their email
+            return {
+              status: ["two-factor", "info"],
+              message: "Confirmation code has already sent to your email",
+            };
           }
-
-          await sendTwoFactorTokenToEmail(
-            token[0].email,
-            token[0].token,
-            "E-commerce DBE Two Factor Authentication Confirmation"
-          );
-
-          return {
-            status: "two-factor",
-            message: "Two factor token sent to your email!",
-          };
+        } else {
+          // If no token exists, generate and send a new one
+          return await handleTwoFactorToken(existingUser.email, {
+            status: ["two-factor", "success"],
+            message: "Confirmation code was sent to your email!",
+          });
         }
       }
 
@@ -109,22 +136,25 @@ export const signInEmail = actionClient
       });
 
       return {
-        status: "success",
+        status: ["success"],
         data: { email, password, code },
-      } as FormStatus;
+      };
     } catch (error) {
       console.error(error);
 
       if (error instanceof AuthError) {
         switch (error.type) {
           case "CredentialsSignin":
-            return { status: "error", message: "Email or password incorrect." };
+            return {
+              status: ["error"],
+              message: "Email or password incorrect",
+            };
           case "AccessDenied":
-            return { status: "error", message: error.message };
+            return { status: ["error"], message: error.message };
           case "OAuthSignInError":
-            return { status: "error", message: error.message };
+            return { status: ["error"], message: error.message };
           default: {
-            return { status: "error", message: "Something went wrong." };
+            return { status: ["error"], message: "Something went wrong" };
           }
         }
       }

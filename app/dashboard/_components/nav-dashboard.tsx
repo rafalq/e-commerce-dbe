@@ -14,7 +14,7 @@ export default function NavDashboard({ links }: NavDashboardProps) {
   const pathname = usePathname();
   return (
     <nav className="my-4">
-      <ul className="flex items-end gap-6 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 p-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full w-full [&::-webkit-scrollbar]:h-2 overflow-x-auto">
+      <ul className="flex items-end gap-6 p-2 w-full scrollbarX">
         <AnimatePresence>
           {links.map(({ label, path, icon }) => (
             <motion.li whileTap={{ scale: 0.95 }} key={label}>

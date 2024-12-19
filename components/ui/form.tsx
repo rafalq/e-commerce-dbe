@@ -10,6 +10,7 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
+  type FormState,
 } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
@@ -44,14 +45,21 @@ const FormField = <
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
-  const { getFieldState, formState } = useFormContext();
 
-  const fieldState = getFieldState(fieldContext.name, formState);
+  const { getFieldState, formState } = useFormContext() ?? {
+    getFieldState: undefined,
+    formState: {} as Partial<FormState<FieldValues>>,
+  };
 
   if (!fieldContext) {
     throw new Error("useFormField should be used within <FormField>");
   }
 
+  const fieldState = getFieldState
+    ? getFieldState(fieldContext.name, formState as FormState<FieldValues>)
+    : {};
+
+  const error = formState.errors?.[fieldContext.name] ?? null;
   const { id } = itemContext;
 
   return {
@@ -61,6 +69,7 @@ const useFormField = () => {
     formDescriptionId: `${id}-form-item-description`,
     formMessageId: `${id}-form-item-message`,
     ...fieldState,
+    error,
   };
 };
 
@@ -80,7 +89,7 @@ const FormItem = React.forwardRef<
 
   return (
     <FormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn("space-y-1", className)} {...props} />
+      <div ref={ref} className={cn(className)} {...props} />
     </FormItemContext.Provider>
   );
 });

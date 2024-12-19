@@ -9,7 +9,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { setToast } from "@/lib/set-toast";
 import { deleteProduct } from "@/server/actions/delete-product";
+import type { TypeApiResponse } from "@/types/type-api-response";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Link from "next/link";
@@ -31,15 +33,11 @@ export default function TableActions({
     },
     onSuccess(data) {
       toast.dismiss();
-      if (data.data?.status === "error") {
-        toast.error(data.data.message || "Something went wrong.");
-      } else if (data.data?.status === "success") {
-        toast.success(data.data.message || "Operation done successfully!");
-      }
+      setToast(data.data as TypeApiResponse);
     },
     onError() {
       toast.dismiss();
-      toast.error("Something went wrong.");
+      toast.error("Something went wrong");
     },
   });
 

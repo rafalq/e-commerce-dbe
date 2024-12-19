@@ -1,10 +1,10 @@
 import Nav from "@/components/navigation/nav";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import CustomToaster from "@/components/ui/custom-toaster";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,21 +29,21 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head />
       <body
         className={cn(
-          "flex flex-col min-h-screen",
           `${geistSans.variable} ${geistMono.variable} antialiased`
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <header>
-            <Nav />
-          </header>
-          <main className="flex flex-col gap-4 mx-auto py-4 w-full md:max-w-2xl">
-            {children}
-          </main>
-          <footer className="mt-auto p-4 text-center">FOOTER</footer>
-          <CustomToaster />
+          <div className="flex flex-col justify-center items-center mx-auto min-h-screen">
+            <header className="w-full">
+              <Nav />
+            </header>
+            <main className="flex flex-col gap-4 mx-auto p-4">{children}</main>
+            <footer className="bg-primary/30 mt-auto p-4 w-full" />
+          </div>
+          <Toaster richColors closeButton expand={true} />
         </ThemeProvider>
       </body>
     </html>

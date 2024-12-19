@@ -8,12 +8,12 @@ export const SchemaSettings = z
     image: z.optional(z.string()),
     email: z.optional(z.string().email()),
     currentPassword: z.optional(
-      z.string().min(8, { message: "Password is minimum 8 characters long." })
+      z.string().min(8, { message: "Password is minimum 8 characters long" })
     ),
     newPassword: z.optional(
       z
         .string()
-        .min(8, { message: "Password must be minimum 8 characters long." })
+        .min(8, { message: "Password must be minimum 8 characters long" })
     ),
     isTwoFactorEnabled: z.optional(z.boolean()),
   })
@@ -25,7 +25,9 @@ export const SchemaSettings = z
       return true;
     },
     {
-      message: "Current password is required to set a new password.",
+      message: "Current password is required to set a new password",
       path: ["currentPassword"],
     }
   );
+
+export type TypeSchemaSettings = z.infer<typeof SchemaSettings>;

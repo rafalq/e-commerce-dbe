@@ -9,6 +9,7 @@ import type { Adapter } from "next-auth/adapters";
 import Credentials from "next-auth/providers/credentials";
 import { SchemaSignIn } from "@/types/schema-sign-in";
 import { eq } from "drizzle-orm";
+import Stripe from "stripe";
 
 type User = {
   id: string;
@@ -17,6 +18,7 @@ type User = {
   image?: string | null;
   emailVerified?: Date | null;
   role?: string | null; // Add other fields expected by NextAuth, except for sensitive ones like password
+  customerId: string | null;
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -63,7 +65,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   secret: process.env.AUTH_SECRET!,
   session: { strategy: "jwt" },
+  events: {
+    createUser: async ({ user }) => {
+      const stripe = new Stripe(process.env.STRIPE_SECRET!, {
+        apiVersion: "2024-11-20.acacia",
+      });
 
+      const customer = await stripe.customers.create({
+        email: user.email!,
+        name: user.name!,
+      });
+
+      await db
+        .update(users)
+        .set({ customerId: customer.id })
+        .where(eq(users.id, user.id!));
+    },
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -100,6 +118,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             image: user.image,
             emailVerified: user.emailVerified,
             role: user.role,
+            customerId: user.customerId,
           };
 
           return sanitizedUser; // Make sure this conforms to the NextAuth `User` type

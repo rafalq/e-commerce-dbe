@@ -1,27 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
+import { useFormField } from "@/components/ui/form";
 import { Input, type InputProps } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { XIcon } from "lucide-react";
-import type { Dispatch, SetStateAction } from "react";
 import { useFormContext } from "react-hook-form";
 
-type CustomInputTagsProps = InputProps & {
+import type { Dispatch, SetStateAction } from "react";
+
+type CustomInputVariantTagsProps = InputProps & {
   value: string[];
   onChange: Dispatch<SetStateAction<string[]>>;
 };
 
-export default function CustomInputTags({
-  value,
-  onChange,
-  ...props
-}: CustomInputTagsProps) {
+const CustomInputVariantTags = forwardRef<
+  HTMLInputElement,
+  CustomInputVariantTagsProps
+>(({ value, onChange, ...props }, ref) => {
   const [pendingDataPoint, setPendingDataPoint] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+
+  const { error } = useFormField();
 
   const { setFocus } = useFormContext();
 
@@ -37,8 +40,10 @@ export default function CustomInputTags({
     <div
       onClick={() => setFocus("tags")}
       className={cn(
+        "flex outline-none ring-ring border-input file:border-0 bg-background file:bg-transparent disabled:opacity-50 p-2 border rounded-md focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-1 w-full min-h-[40px] file:font-medium text-sm file:text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed ",
         isFocused ? "ring-offset-2 ring-2" : "ring-offset-0 ring-0",
-        "flex outline-none ring-ring border-input file:border-0 bg-background file:bg-transparent disabled:opacity-50 p-2 border rounded-md focus-visible:ring-2 focus-visible:ring-ring ring-offset-background focus-visible:ring-offset-2 w-full min-h-[40px] file:font-medium text-sm file:text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed"
+        isFocused && error && "ring-destructive/50",
+        error && "bg-destructive/10 border-destructive/40"
       )}
     >
       <motion.div className="flex flex-wrap items-center gap-2 rounded-md min-h-[2.5rem]">
@@ -53,8 +58,9 @@ export default function CustomInputTags({
               <Badge variant={"secondary"}>
                 {tag}
                 <button
-                  className="ml-1 w-3"
+                  type="button"
                   onClick={() => onChange(value.filter((i) => i !== tag))}
+                  className="ml-1 w-3"
                 >
                   <XIcon className="w-3 text-destructive" />
                 </button>
@@ -83,6 +89,7 @@ export default function CustomInputTags({
               }
             }}
             value={pendingDataPoint}
+            ref={ref}
             className="border-transparent focus-visible:border-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
             {...props}
           />
@@ -90,4 +97,8 @@ export default function CustomInputTags({
       </motion.div>
     </div>
   );
-}
+});
+
+CustomInputVariantTags.displayName = "CustomInputVariantTags";
+
+export default CustomInputVariantTags;

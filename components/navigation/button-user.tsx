@@ -17,6 +17,7 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import CustomAvatarFallback from "../ui/custom-avatar-fallback";
 
 export default function ButtonUser({ user }: Session) {
   const { setTheme, theme, resolvedTheme } = useTheme(); // Get resolvedTheme to check the system preference
@@ -26,7 +27,7 @@ export default function ButtonUser({ user }: Session) {
 
   useEffect(() => {
     handleTheme();
-  }, [resolvedTheme]); // Add resolvedTheme to trigger when the theme changes
+  }, [resolvedTheme]);
 
   function handleCheckedChange(e: boolean) {
     setIsChecked(e);
@@ -48,18 +49,21 @@ export default function ButtonUser({ user }: Session) {
 
   return (
     <DropdownMenu modal={false}>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger className="focus-visible:outline-none">
         <Avatar>
           <Suspense
             fallback={<LoaderCircle className="w-6 h-6 animate-spin" />}
           >
             {user?.image ? (
-              <Image src={user.image} alt={user.name || "user avatar"} fill />
+              <Image
+                src={user.image}
+                alt={user.name || "user avatar"}
+                fill
+                sizes="(max-width: 40px)"
+              />
             ) : (
               <AvatarFallback>
-                <p className="font-bold text-primary dark:text-primary">
-                  {user?.name?.charAt(0).toUpperCase()}
-                </p>
+                <CustomAvatarFallback name={user?.name || ""} />
               </AvatarFallback>
             )}
           </Suspense>
@@ -106,7 +110,7 @@ export default function ButtonUser({ user }: Session) {
           )}
         </DropdownMenuItem>
         <DropdownMenuItem
-          onClick={() => signOut()}
+          onClick={() => signOut({ redirectTo: "/" })}
           className="focus:dark:bg-destructive focus:bg-destructive/10 p-3 cursor-pointer group"
         >
           <DropdownMenuItemContent

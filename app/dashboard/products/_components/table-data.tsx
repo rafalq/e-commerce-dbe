@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import CustomCardWrapper from "@/components/ui/custom-card-wrapper";
 import CustomTooltip from "@/components/ui/custom-tooltip";
 import { Input } from "@/components/ui/input";
 import {
@@ -46,7 +45,7 @@ export function TableData<TData, TValue>({
     pageSize: 5,
   });
 
-  const [sorting, setSorting] = useState<SortingState>([]);
+  const [sorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
@@ -65,7 +64,7 @@ export function TableData<TData, TValue>({
   });
 
   return (
-    <CustomCardWrapper title="Products" description="Edit | Delete">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">
         <PackageSearch className="w-6 h-6 text-primary/50" />
         <Input
@@ -127,71 +126,75 @@ export function TableData<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+
       {/* --- pagination */}
-      <div className="flex md:flex-row flex-col justify-center items-center gap-4 md:gap-2">
-        <div className="flex justify-center items-center gap-2">
-          <Button
-            onClick={() => table.firstPage()}
-            disabled={!table.getCanPreviousPage()}
-            size={"sm"}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <ChevronsLeft className="w-4 h-4" />
-            First
-          </Button>
-          <Button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            size={"sm"}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <ChevronLeft className="w-4 h-4" />
-            Previous
-          </Button>
-          <CustomTooltip text="Page number">
-            <p className="bg-secondary px-4 py-2 font-semibold text-sm">
-              {pagination.pageIndex + 1}
-            </p>
+
+      {data.length > 1 && (
+        <div className="flex justify-center items-center gap-4 md:gap-2">
+          <div className="flex justify-center items-center gap-2">
+            <Button
+              onClick={() => table.firstPage()}
+              disabled={!table.getCanPreviousPage()}
+              size={"sm"}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <ChevronsLeft className="w-4 h-4" />
+              <span className="md:block hidden">First</span>
+            </Button>
+            <Button
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              size={"sm"}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span className="md:block hidden">Previous</span>
+            </Button>
+            <CustomTooltip text="Page number">
+              <p className="bg-secondary px-4 py-2 font-semibold text-sm">
+                {pagination.pageIndex + 1}
+              </p>
+            </CustomTooltip>
+            <Button
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              size={"sm"}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <span className="md:block hidden">Next</span>
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+            <Button
+              onClick={() => table.lastPage()}
+              disabled={!table.getCanNextPage()}
+              size={"sm"}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <span className="md:block hidden">Last</span>
+              <ChevronsRight className="w-4 h-4" />
+            </Button>
+          </div>
+          <CustomTooltip text="Select maximum number of rows  per page">
+            <select
+              value={table.getState().pagination.pageSize}
+              onChange={(e) => {
+                table.setPageSize(Number(e.target.value));
+              }}
+              className="p-2 text-sm"
+            >
+              {[1, 5, 10, 20, 40].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  {pageSize}
+                </option>
+              ))}
+            </select>
           </CustomTooltip>
-          <Button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            size={"sm"}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            Next
-            <ChevronRight className="w-4 h-4" />
-          </Button>
-          <Button
-            onClick={() => table.lastPage()}
-            disabled={!table.getCanNextPage()}
-            size={"sm"}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            Last
-            <ChevronsRight className="w-4 h-4" />
-          </Button>
         </div>
-        <CustomTooltip text="Select maximum number of rows  per page">
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => {
-              table.setPageSize(Number(e.target.value));
-            }}
-            className="p-2 text-sm"
-          >
-            {[1, 5, 10, 20, 40].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize}
-              </option>
-            ))}
-          </select>
-        </CustomTooltip>
-      </div>
-    </CustomCardWrapper>
+      )}
+    </div>
   );
 }

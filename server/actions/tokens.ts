@@ -8,6 +8,8 @@ import {
   users,
   verificationTokens,
 } from "@/server/schema";
+import { randomInt } from "crypto";
+import type { TypeApiResponse } from "@/types/type-api-response";
 
 // --- email verification ---
 
@@ -57,18 +59,26 @@ export async function verifyEmail(token: string) {
     where: eq(verificationTokens.token, token),
   });
 
-  if (!existingToken) return { status: "error", message: "Token not found." };
+  if (!existingToken)
+    return { status: ["error"], message: "Token not found" } as TypeApiResponse;
 
   const hasExpired = new Date(existingToken.expires) < new Date();
 
-  if (hasExpired) return { status: "error", message: "Token has expired." };
+  if (hasExpired)
+    return {
+      status: ["error"],
+      message: "Token has expired",
+    } as TypeApiResponse;
 
   const existingUser = await db.query.users.findFirst({
     where: eq(users.email, existingToken.email),
   });
 
   if (!existingUser)
-    return { status: "error", message: "Email does not exist" };
+    return {
+      status: ["error"],
+      message: "Email does not exist",
+    } as TypeApiResponse;
 
   await db
     .update(users)
@@ -81,7 +91,10 @@ export async function verifyEmail(token: string) {
     .delete(verificationTokens)
     .where(eq(verificationTokens.email, existingToken.email));
 
-  return { status: "success", message: "Email verified successfully!" };
+  return {
+    status: ["success"],
+    message: "Email verified successfully!",
+  } as TypeApiResponse;
 }
 
 // ---- reset password ---
@@ -127,7 +140,10 @@ export async function getResetPasswordTokenByToken(token: string) {
     });
     return resetPasswordToken;
   } catch (error) {
-    return { status: "error", message: error || "Token not found." };
+    return {
+      status: ["error"],
+      message: error || "Token not found.",
+    } as TypeApiResponse;
   }
 }
 
@@ -147,8 +163,7 @@ export async function getResetPasswordTokenByEmail(email: string) {
 
 export async function generateTwoFactorToken(email: string) {
   try {
-    const arr = new Uint16Array(1);
-    const newToken = crypto.getRandomValues(arr);
+    const newToken = randomInt(100000, 1000000);
 
     const expires = new Date(new Date().getTime() + 3600 * 1000);
 
@@ -165,7 +180,7 @@ export async function generateTwoFactorToken(email: string) {
     const twoFactorToken = db
       .insert(twoFactorTokens)
       .values({
-        token: newToken[0].toString(),
+        token: newToken.toString(),
         expires,
         email,
         userId: tokenUser?.id as string,

@@ -176,6 +176,62 @@
       "when": 1730550989819,
       "tag": "0024_panoramic_wong",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1732287726545,
+      "tag": "0025_clumsy_sersi",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1732470250917,
+      "tag": "0026_sour_cammi",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1733314796553,
+      "tag": "0027_modern_shockwave",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1733315047013,
+      "tag": "0028_slippery_union_jack",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1733397389177,
+      "tag": "0029_oval_pepper_potts",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1733837662448,
+      "tag": "0030_oval_prodigy",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1734189438815,
+      "tag": "0031_green_guardsmen",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1734270993051,
+      "tag": "0032_broad_wrecker",
+      "breakpoints": true
     }
   ]
 }

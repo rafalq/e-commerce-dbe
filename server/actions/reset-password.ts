@@ -1,12 +1,13 @@
 "use server";
 
 import { SchemaResetPassword } from "@/types/schema-reset-password";
+import type { TypeApiResponse } from "@/types/type-api-response";
 import { eq } from "drizzle-orm";
+import { actionClient } from ".";
 import { db } from "..";
 import { users } from "../schema";
-import { actionClient } from ".";
-import { generateResetPasswordToken } from "./tokens";
 import { sendTokenToEmail } from "./send-token-to-email";
+import { generateResetPasswordToken } from "./tokens";
 
 export const resetPassword = actionClient
   .schema(SchemaResetPassword)
@@ -18,16 +19,19 @@ export const resetPassword = actionClient
       });
 
       if (!existingUser) {
-        return { status: "error", message: "User not found." };
+        return {
+          status: ["error"],
+          message: "User not found",
+        } as TypeApiResponse;
       }
 
       const resetPasswordToken = await generateResetPasswordToken(email);
 
       if (!resetPasswordToken) {
         return {
-          status: "error",
-          message: "Token not generated. Try one more time.",
-        };
+          status: ["error"],
+          message: "Token not generated. Try one more time",
+        } as TypeApiResponse;
       }
 
       sendTokenToEmail(
@@ -35,13 +39,14 @@ export const resetPassword = actionClient
         resetPasswordToken[0].token,
         "/auth/new-password",
         "Reset Password",
-        "to change your password for the new one."
+        "to change your password."
       );
 
       return {
-        status: "success",
-        message: "Reset password instructions sent to your email.",
-      };
+        status: ["success"],
+        message: "Instructions sent to your email",
+        data: { redirect: "/" },
+      } as TypeApiResponse;
     } catch (error) {
       console.error(error);
     }

@@ -21,7 +21,7 @@ export default function CustomCardWrapper({
   footer,
 }: CustomCardWrapperProps) {
   return (
-    <Card className="px-4 pt-2 w-full">
+    <Card className="px-4 py-6 w-full">
       <CardHeader className="pb-8 text-center">
         {title && (
           <CardTitle className="font-bold text-3xl sm:text-4xl tracking-tight">

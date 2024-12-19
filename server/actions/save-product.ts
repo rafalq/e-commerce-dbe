@@ -6,6 +6,7 @@ import { SchemaProduct } from "@/types/schema-product";
 import { eq } from "drizzle-orm";
 import { products } from "../schema";
 import { revalidatePath } from "next/cache";
+import { hasChanges } from "@/lib/has-changes";
 
 export const saveProduct = actionClient
   .schema(SchemaProduct)
@@ -19,9 +20,23 @@ export const saveProduct = actionClient
         });
 
         if (!currentProduct)
-          return { status: "error", message: "Product not found." };
+          return { status: ["error"], message: "Product not found." };
 
-        // --- if so, update the product
+        // --- if no changes made
+
+        const hasUpdates = hasChanges({
+          currentData: currentProduct,
+          newData: { title, description, price },
+        });
+
+        if (!hasUpdates) {
+          return {
+            status: ["warning"],
+            message: "No changes detected to update",
+          };
+        }
+
+        // --- else update the product
 
         const editedProduct = await db
           .update(products)
@@ -30,9 +45,11 @@ export const saveProduct = actionClient
           .returning();
 
         revalidatePath("/dashboard/products");
+        revalidatePath("/");
+        revalidatePath("/products/[slug]", "page");
 
         return {
-          status: "success",
+          status: ["success"],
           message: `Product "${editedProduct[0].title}" updated successfully!`,
         };
 
@@ -44,14 +61,16 @@ export const saveProduct = actionClient
           .returning();
 
         revalidatePath("/dashboard/products");
+        revalidatePath("/");
+        revalidatePath("/products/[slug]", "page");
 
         return {
-          status: "success",
+          status: ["success"],
           message: `Product "${newProduct[0].title}" created successfully!`,
         };
       }
     } catch (error) {
       console.error(error);
-      return { status: "error", message: "Failed to save product." };
+      return { status: ["error"], message: "Failed to save product." };
     }
   });

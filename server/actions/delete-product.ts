@@ -1,11 +1,17 @@
 "use server";
 
+import { actionClient } from "@/server/actions";
 import { db } from "@/server/index";
-import { products } from "@/server/schema";
+import { products, productVariants } from "@/server/schema";
+import { algoliasearch } from "algoliasearch";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { actionClient } from "./index";
+
+const clientAlgolia = algoliasearch(
+  process.env.NEXT_PUBLIC_ALGOLIA_ID!,
+  process.env.ALGOLIA_SECRET!
+);
 
 export const deleteProduct = actionClient
   .schema(
@@ -16,24 +22,40 @@ export const deleteProduct = actionClient
   )
   .action(async ({ parsedInput: { id, title } }) => {
     if (!id) {
-      return { status: "error", message: "Product ID is required." };
+      return { status: ["error"], message: "Product ID is required." };
     }
     try {
+      const variantsForProduct = await db.query.productVariants.findMany({
+        where: eq(productVariants.productId, id),
+      });
+
+      if (variantsForProduct) {
+        const variantIds = Array.from([...variantsForProduct], ({ id }) =>
+          id.toString()
+        );
+        await clientAlgolia.deleteObjects({
+          indexName: "products",
+          objectIDs: variantIds,
+        });
+      }
+
       const data = await db
         .delete(products)
         .where(eq(products.id, id))
         .returning();
 
       revalidatePath("/dashboard/products");
+      revalidatePath("/");
+      revalidatePath("/products/[slug]", "page");
 
       return {
-        status: "success",
+        status: ["success"],
         message: `Product "${data[0].title}" deleted successfully!`,
       };
     } catch (error) {
       console.error(error);
       return {
-        status: "error",
+        status: ["error"],
         message: `Failed to delete product "${title}".`,
       };
     }

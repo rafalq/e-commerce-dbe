@@ -8,6 +8,7 @@ import { db } from "..";
 import { auth } from "../auth";
 import { users } from "../schema";
 import { actionClient } from ".";
+import { hasChanges } from "@/lib/has-changes";
 
 export const updateSettings = actionClient
   .schema(SchemaSettings)
@@ -26,12 +27,24 @@ export const updateSettings = actionClient
         const session = await auth();
         let updatedUserDetails = null;
 
-        if (!session) return { status: "error", message: "User not found." };
+        if (!session) return { status: ["error"], message: "User not found." };
 
         const user = await db.query.users.findFirst({
           where: eq(users.id, session.user.id),
         });
-        if (!user) return { status: "error", message: "User not found." };
+        if (!user) return { status: ["error"], message: "User not found." };
+
+        const hasUpdates = hasChanges({
+          currentData: user,
+          newData: { name, email, image, twoFactorEnabled: isTwoFactorEnabled },
+        });
+
+        if (!hasUpdates && !newPassword) {
+          return {
+            status: ["warning"],
+            message: "No changes detected to update.",
+          };
+        }
 
         if (!!session.user.isOAuth) {
           image = undefined;
@@ -44,8 +57,8 @@ export const updateSettings = actionClient
         if (newPassword !== undefined && newPassword?.trim().length > 0) {
           if (!currentPassword) {
             return {
-              status: "error",
-              message: "Confirm your current password.",
+              status: ["error"],
+              message: "Confirm your current password",
             };
           }
           if (currentPassword && newPassword) {
@@ -61,14 +74,14 @@ export const updateSettings = actionClient
 
             if (!passwordMatch)
               return {
-                status: "error",
-                message: "Current password incorrect.",
+                status: ["error"],
+                message: "Current password incorrect",
               };
 
             if (passwordSame)
               return {
-                status: "error",
-                message: "New password is the same as the current password.",
+                status: ["error"],
+                message: "New password is the same as the current password",
               };
           }
 
@@ -103,7 +116,7 @@ export const updateSettings = actionClient
         revalidatePath("/dashboard/settings");
 
         return {
-          status: "success",
+          status: ["success"],
           message: "Settings updated successfully!",
           data: updatedUserDetails,
         };

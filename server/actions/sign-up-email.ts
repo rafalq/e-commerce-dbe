@@ -1,14 +1,14 @@
 "use server";
 
+import { SchemaSignUp } from "@/types/schema-sign-up";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
+import { actionClient } from ".";
 import { db } from "..";
 import { users } from "../schema";
-import { actionClient } from ".";
-import { SchemaSignUp } from "@/types/schema-sign-up";
-import { generateEmailVerificationToken } from "./tokens";
 import { sendTokenToEmail } from "./send-token-to-email";
-import type { FormStatus } from "@/types/form-status";
+import { generateEmailVerificationToken } from "./tokens";
+import Stripe from "stripe";
 
 export const signUpEmail = actionClient
   .schema(SchemaSignUp)
@@ -19,16 +19,13 @@ export const signUpEmail = actionClient
       // --- do password and passwordConfirmation match?
       if (password !== passwordConfirmation) {
         return {
-          status: "error",
+          status: ["error"],
           message: "Passwords do not match.",
-        } as FormStatus;
+        };
       }
 
       // --- hash password ---
       const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Debug logging to ensure password was hashed
-      console.log("Hashed password:", hashedPassword);
 
       // --- check for existing user ---
       const existingUser = await db.query.users.findFirst({
@@ -48,20 +45,30 @@ export const signUpEmail = actionClient
           );
 
           return {
-            status: "success",
+            status: ["success"],
             message: "Verification token sent to your email.",
           };
         }
         return {
-          status: "error",
+          status: ["error"],
           message: "Email already in use.",
-        } as FormStatus;
+        };
       }
+
+      const stripe = new Stripe(process.env.STRIPE_SECRET!, {
+        apiVersion: "2024-11-20.acacia",
+      });
+
+      const customer = await stripe.customers.create({
+        email,
+        name,
+      });
 
       await db.insert(users).values({
         name,
         email,
         password: hashedPassword,
+        customerId: customer.id,
       });
 
       const verificationToken = await generateEmailVerificationToken(email);
@@ -74,7 +81,7 @@ export const signUpEmail = actionClient
       );
 
       return {
-        status: "success",
+        status: ["success"],
         message: "Verification token sent to your email.",
       };
     }

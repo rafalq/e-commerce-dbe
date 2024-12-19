@@ -8,6 +8,9 @@ export const ourFileRouter = {
   avatarUploader: f({ image: { maxFileSize: "2MB" } })
     // Set permissions and file types for this FileRoute
     .onUploadComplete(async () => {}),
+  variantUploader: f({
+    image: { maxFileCount: 10, maxFileSize: "4MB" },
+  }).onUploadComplete(async () => {}),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

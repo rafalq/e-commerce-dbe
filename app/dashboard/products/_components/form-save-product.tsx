@@ -1,15 +1,18 @@
 "use client";
 
 import CustomButtonSubmit from "@/components/ui/custom-button-submit";
-import CustomFormField from "@/components/ui/custom-form-field";
 import FormCard from "@/components/ui/custom-card-wrapper";
+import CustomFormField from "@/components/ui/custom-form-field";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import Tiptap from "@/components/ui/tiptap";
+import { hasChanges } from "@/lib/has-changes";
+import { setToast } from "@/lib/set-toast";
 import { cn } from "@/lib/utils";
 import { getProduct } from "@/server/actions/get-product";
 import { saveProduct } from "@/server/actions/save-product";
-import { SchemaProduct } from "@/types/schema-product";
+import { SchemaProduct, type TypeSchemaProduct } from "@/types/schema-product";
+import type { TypeApiResponse } from "@/types/type-api-response";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DollarSign } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
@@ -17,7 +20,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from "zod";
 
 type TiptapRef = {
   clearContent: () => void;
@@ -25,7 +27,7 @@ type TiptapRef = {
 
 export default function FormSaveProduct() {
   const tiptapRef = useRef<TiptapRef | null>(null);
-  const form = useForm<z.infer<typeof SchemaProduct>>({
+  const form = useForm<TypeSchemaProduct>({
     resolver: zodResolver(SchemaProduct),
     defaultValues: {
       title: "",
@@ -54,11 +56,11 @@ export default function FormSaveProduct() {
     if (editMode) {
       const { status, message, data: product } = await getProduct(id);
 
-      if (status === "error") {
+      if (status[0] === "error") {
         toast.error(message);
         router.push("/dashboard/products");
         return;
-      } else if (status === "success" && product) {
+      } else if (status[0] === "success" && product) {
         const id = parseInt(editMode);
         form.setValue("title", product.title);
         form.setValue("description", product.description);
@@ -74,12 +76,9 @@ export default function FormSaveProduct() {
     },
     onSuccess(data) {
       toast.dismiss();
-      if (data.data?.status === "error") {
-        toast.error(data.data.message || "Something went wrong.");
-      } else if (data.data?.status === "success") {
+      setToast(data.data as TypeApiResponse);
+      if (data.data?.status[0] === "success")
         router.push("/dashboard/products");
-        toast.success(data.data.message || "Operation done successfully!");
-      }
     },
     onError() {
       toast.dismiss();
@@ -87,7 +86,15 @@ export default function FormSaveProduct() {
     },
   });
 
-  function onSubmit(parsedInput: z.infer<typeof SchemaProduct>) {
+  function onSubmit(parsedInput: TypeSchemaProduct) {
+    const currentData = form.control._defaultValues;
+    const newData = form.getValues();
+
+    if (!hasChanges({ currentData, newData })) {
+      toast.warning("No changes detected");
+      return;
+    }
+
     execute(parsedInput);
   }
 
@@ -155,7 +162,8 @@ export default function FormSaveProduct() {
 
           {/* ---- submit button ---- */}
           <CustomButtonSubmit
-            disabled={status === "executing" || !form.formState.isValid}
+            label={(editMode ? "UPDATE" : "CREATE") + " PRODUCT"}
+            disabled={status === "executing"}
             className={cn(status === "executing" && "animate-pulse")}
           />
         </form>

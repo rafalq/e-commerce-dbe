@@ -14,7 +14,7 @@ const Tiptap = forwardRef(({ val }: { val: string }, ref) => {
     immediatelyRender: false,
     extensions: [
       Placeholder.configure({
-        placeholder: "This is a description of a new product.",
+        // placeholder: "This is a description of a new product.",
         emptyNodeClass:
           "first:before:text-gray-400 first:before:float-left first:before:content-[attr(data-placeholder)] first:before:pointer-events-none",
       }),
@@ -30,11 +30,18 @@ const Tiptap = forwardRef(({ val }: { val: string }, ref) => {
             class: "list-disc pl-4",
           },
         },
+
+        paragraph: {
+          HTMLAttributes: {
+            class: "min-h-[1rem]",
+          },
+        },
       }),
     ],
 
     onUpdate: ({ editor }) => {
-      const content = editor.getHTML();
+      const content = editor.getHTML().replace(/&nbsp;/g, " ");
+
       setValue("description", content, {
         shouldValidate: true,
         shouldDirty: true,

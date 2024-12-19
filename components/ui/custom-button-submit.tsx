@@ -12,10 +12,12 @@ export default function CustomButtonSubmit({
   ...props
 }: CustomButtonSubmitProps & ButtonProps) {
   return (
-    <div className="block sm:flex sm:flex-row-reverse">
+    <div className="block sm:flex sm:flex-row-reverse pt-4">
       <Button type="submit" className={cn(`${className}`)} {...props}>
         <div className="flex items-center gap-2">
-          <p className="font-semibold uppercase">{label ? label : "submit"}</p>
+          <p className="font-semibold uppercase tracking-wide">
+            {label ? label : "submit"}
+          </p>
         </div>
       </Button>
     </div>

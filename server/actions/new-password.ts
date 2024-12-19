@@ -24,21 +24,21 @@ export const newPassword = actionClient
 
         // --- has token?
         if (!token) {
-          return { status: "error", message: "Missing token." };
+          return { status: ["error"], message: "Missing token." };
         }
 
         // --- has token or is token valid?
         const existingToken = await getResetPasswordTokenByToken(token);
 
         if (!existingToken || "status" in existingToken) {
-          return { status: "error", message: "Token not found." };
+          return { status: ["error"], message: "Token not found." };
         } else {
           // --- did token expire?
           const hasExpired = new Date(existingToken.expires) < new Date();
 
           if (hasExpired)
             return {
-              status: "error",
+              status: ["error"],
               message:
                 'Token has expired. Get a new one by clicking "Forgot password" link.',
             };
@@ -50,7 +50,10 @@ export const newPassword = actionClient
         });
 
         if (!existingUser) {
-          return { status: "error", message: "User not found. Sign up first." };
+          return {
+            status: ["error"],
+            message: "User not found. Sign up first.",
+          };
         } else {
           // --- is user's email verified?
           if (!existingUser.emailVerified) {
@@ -66,8 +69,9 @@ export const newPassword = actionClient
             );
 
             return {
-              status: "success",
+              status: ["success"],
               message: "Verification token sent to your email.",
+              data: { redirect: "/" },
             };
           }
         }
@@ -75,7 +79,7 @@ export const newPassword = actionClient
         // --- do password and passwordConfirmation match?
         if (password !== passwordConfirmation) {
           return {
-            status: "error",
+            status: ["error"],
             message: "Passwords do not match.",
           };
         }
@@ -94,7 +98,11 @@ export const newPassword = actionClient
             .where(eq(resetPasswordTokens.id, existingToken.id));
         });
 
-        return { status: "success", message: "Password updated successfully!" };
+        return {
+          status: ["success"],
+          message: "Password updated successfully!",
+          data: { redirect: "/auth/sign-in" },
+        };
       } catch (error) {
         console.error(error);
       }

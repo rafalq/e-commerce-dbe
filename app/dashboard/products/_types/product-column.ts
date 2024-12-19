@@ -1,4 +1,4 @@
-import type { VariantsWithImagesTags } from "./variants-with-images-tags";
+import type { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
 
 export type ProductColumn = {
   id: number;

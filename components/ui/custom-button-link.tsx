@@ -11,7 +11,7 @@ export default function CustomButtonLink({
   href,
 }: CustomButtonLinkProps) {
   return (
-    <Button variant="link" className="font-semibold underline" asChild>
+    <Button variant="link" className="underline" asChild>
       <Link aria-label={label} href={href}>
         {label}
       </Link>

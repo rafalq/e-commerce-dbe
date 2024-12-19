@@ -37,3 +37,6 @@ next-env.d.ts
 
 # code formatter
 .prettierrc
+
+# for testing purposes
+/in-progress

@@ -48,7 +48,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex flex-col items-center gap-6 mt-6">
       <NavDashboard links={links} />
-      <div className="w-full md:max-w-2xl">{children}</div>
+      <div className="w-full">{children}</div>
     </div>
   );
 }

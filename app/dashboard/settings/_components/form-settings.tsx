@@ -3,10 +3,9 @@
 import { CircleAlert, LoaderCircle, Pen } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ControllerRenderProps, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import * as z from "zod";
 
 import { UploadButton } from "@/app/api/uploadthing/_components";
 import CustomButtonSubmit from "@/components/ui/custom-button-submit";
@@ -19,10 +18,15 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { updateSettings } from "@/server/actions/update-settings";
-import { SchemaSettings } from "@/types/schema-settings";
+import {
+  SchemaSettings,
+  type TypeSchemaSettings,
+} from "@/types/schema-settings";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { Session } from "next-auth";
+import { hasChanges } from "@/lib/has-changes";
+import CustomAvatarFallback from "@/components/ui/custom-avatar-fallback";
 
 type FormSettings = {
   session: Session;
@@ -39,8 +43,6 @@ type FormFields = {
 
 export function FormSettings({ session }: FormSettings) {
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [isAvatarChanged, setIsAvatarChanged] = useState(false);
-  const [isButtonBlocked, setIsButtonBlocked] = useState(true);
   const [isCurrentPasswordRequired, setIsCurrentPasswordRequired] =
     useState(false);
 
@@ -57,14 +59,10 @@ export function FormSettings({ session }: FormSettings) {
       newPassword: undefined,
       isTwoFactorEnabled: session?.user?.isTwoFactorEnabled || false,
     },
+    resetOptions: {
+      keepDirtyValues: true,
+    },
   });
-
-  useEffect(() => {
-    const subscription = form.watch(() => {
-      setIsButtonBlocked(false);
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
 
   const { execute, status } = useAction(updateSettings, {
     onExecute() {
@@ -73,21 +71,12 @@ export function FormSettings({ session }: FormSettings) {
     onSuccess(data) {
       toast.dismiss();
 
-      if (data.data?.status === "error") {
+      if (data.data?.status[0] === "error") {
         toast.error(data.data.message || "Something went wrong.");
-      } else if (data.data?.status === "success") {
-        // Show success message
+      } else if (data.data?.status[0] === "success") {
         toast.success(data.data.message || "Operation done successfully!");
-
-        form.resetField("newPassword");
-        form.resetField("currentPassword");
-
-        if (currentPasswordRef.current) currentPasswordRef.current.value = "";
-        if (newPasswordRef.current) newPasswordRef.current.value = "";
-
-        setIsCurrentPasswordRequired(false);
-        setIsButtonBlocked(true);
-        setIsAvatarChanged(false);
+      } else if (data.data?.status[0] === "warning") {
+        toast.warning(data.data.message || "Operation suspended.");
       }
     },
     onError() {
@@ -96,8 +85,16 @@ export function FormSettings({ session }: FormSettings) {
     },
   });
 
-  function onSubmit(parsedInput: z.infer<typeof SchemaSettings>) {
+  function onSubmit(parsedInput: TypeSchemaSettings) {
+    const currentData = form.control._defaultValues;
+    const newData = form.getValues();
+
+    if (!hasChanges({ currentData, newData })) {
+      toast.warning("No changes detected");
+      return;
+    }
     execute(parsedInput);
+    form.reset();
   }
 
   function handleNewPasswordChange(
@@ -110,8 +107,11 @@ export function FormSettings({ session }: FormSettings) {
     if (inputValue.trim().length > 0) {
       setIsCurrentPasswordRequired(true);
     } else {
+      form.clearErrors("newPassword");
+      form.clearErrors("currentPassword");
       form.resetField("newPassword");
       form.resetField("currentPassword");
+
       setIsCurrentPasswordRequired(false);
     }
   }
@@ -131,7 +131,7 @@ export function FormSettings({ session }: FormSettings) {
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <div className="flex justify-between">
+          <div className="flex md:flex-row flex-col md:justify-between">
             {/* ---- avatar input ---- */}
             <FormField
               control={form.control}
@@ -140,15 +140,14 @@ export function FormSettings({ session }: FormSettings) {
                 <CustomFormField label="Avatar">
                   <div className="flex items-center">
                     {!form.getValues("image") && (
-                      <div className="font-bold">
-                        {session.user?.name?.charAt(0).toUpperCase()}
-                      </div>
+                      <CustomAvatarFallback name={session.user?.name || ""} />
                     )}
                     {form.getValues("image") && (
                       <Image
                         src={form.getValues("image")!}
                         width={42}
                         height={42}
+                        style={{ height: "auto", width: "auto" }}
                         className="rounded-full"
                         alt="User Image"
                       />
@@ -165,14 +164,15 @@ export function FormSettings({ session }: FormSettings) {
                             type: "validate",
                             message: error.message,
                           });
-                          setIsAvatarChanged(true);
+
                           setAvatarUploading(false);
                           return;
                         }}
                         onClientUploadComplete={(res) => {
                           form.setValue("image", res[0].url!);
+                          form.trigger("image");
                           setAvatarUploading(false);
-                          setIsButtonBlocked(false);
+
                           return;
                         }}
                         content={{
@@ -241,7 +241,15 @@ export function FormSettings({ session }: FormSettings) {
                       status === "executing" || !!session.user.isOAuth === true
                     }
                     value={form.watch("newPassword") || ""}
-                    onBlur={field.onBlur}
+                    onBlur={(e) =>
+                      handleNewPasswordChange(
+                        e,
+                        field as ControllerRenderProps<
+                          FormFields,
+                          "newPassword"
+                        >
+                      )
+                    }
                     onChange={(e) =>
                       handleNewPasswordChange(
                         e,
@@ -305,13 +313,9 @@ export function FormSettings({ session }: FormSettings) {
 
           {/* ---- submit button ---- */}
           <CustomButtonSubmit
-            disabled={
-              status === "executing" ||
-              avatarUploading ||
-              isButtonBlocked ||
-              (!form.formState.isDirty && isAvatarChanged)
-            }
-            className={cn(status === "executing" && "animate-pulse")}
+            label="UPDATE SETTINGS"
+            disabled={status === "executing" || avatarUploading}
+            className={cn("mt-6", status === "executing" && "animate-pulse")}
           />
         </form>
       </Form>
