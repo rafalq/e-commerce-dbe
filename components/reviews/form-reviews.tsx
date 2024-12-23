@@ -66,7 +66,7 @@ export default function FormReviews() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="w-full font-semibold" variant="minSecondary">
+        <Button className="w-full font-semibold" variant="secondary">
           LEAVE A REVIEW
         </Button>
       </PopoverTrigger>

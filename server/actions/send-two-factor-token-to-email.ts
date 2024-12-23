@@ -1,5 +1,6 @@
 "use server";
 
+import TwoFactorEmail from "@/app/(auth)/_components/two-factor-email";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -13,7 +14,7 @@ export async function sendTwoFactorTokenToEmail(
     from: "Acme <onboarding@resend.dev>",
     to: [email],
     subject: `${subject}`,
-    html: `<p>Your Confirmation Code: ${token} </p>`,
+    react: TwoFactorEmail({ token }),
   });
 
   if (error) {

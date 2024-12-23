@@ -5,7 +5,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  useFormField,
 } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 import { ReactNode } from "react";
 import {
   useFormContext,
@@ -15,20 +17,21 @@ import {
 } from "react-hook-form";
 
 type FormFieldWrapperProps<T extends FieldValues> = {
-  fieldName: Path<T>;
-  label: string;
-  labelSign?: ReactNode;
+  name: Path<T>;
   description?: string;
-  children: (field: ControllerRenderProps<T, Path<T>>) => React.ReactNode;
-};
+  children: (field: ControllerRenderProps<T, Path<T>>) => ReactNode;
+} & (
+  | { label?: undefined; labelIcon?: undefined }
+  | { label: string; labelIcon?: ReactNode }
+);
 
-const FormFieldWrapper = <T extends FieldValues>({
-  fieldName,
+export default function FormFieldWrapper<T extends FieldValues>({
+  name,
   label,
-  labelSign,
+  labelIcon,
   description,
   children,
-}: FormFieldWrapperProps<T>) => {
+}: FormFieldWrapperProps<T>) {
   const form = useFormContext();
 
   if (!form) throw new Error("FormContext is not provided");
@@ -36,31 +39,63 @@ const FormFieldWrapper = <T extends FieldValues>({
   return (
     <FormField
       control={form.control}
-      name={fieldName}
+      name={name}
       render={({ field }) => (
-        <FormItem>
-          <FormLabel className="flex gap-2 mb-3 font-semibold">
-            {label}
-            {labelSign && labelSign}
-          </FormLabel>
-          {description && (
-            <FormDescription className="mb-1 text-xs">
-              {description}
-            </FormDescription>
-          )}
-
-          <FormControl>
-            <>{children(field as ControllerRenderProps<T, Path<T>>)}</>
-          </FormControl>
-          <div className="mt-3">
-            <FormMessage className="inline text-right bg-destructive/10 px-2 py-1 rounded-md" />
-          </div>
-        </FormItem>
+        <FormItemWrapper
+          label={label as string}
+          labelIcon={labelIcon}
+          description={description}
+          field={field as ControllerRenderProps<T, Path<T>>}
+        >
+          {(field) => children(field)}
+        </FormItemWrapper>
       )}
     />
   );
-};
+}
 
-FormFieldWrapper.displayName = "FormFieldWrapper";
+type FormItemWrapperProps<T extends FieldValues> = {
+  description?: string;
+  field: ControllerRenderProps<T, Path<T>>;
+  children: (field: ControllerRenderProps<T, Path<T>>) => ReactNode;
+} & (
+  | { label?: undefined; labelIcon?: undefined }
+  | { label: string; labelIcon?: ReactNode }
+);
 
-export default FormFieldWrapper;
+function FormItemWrapper<T extends FieldValues>({
+  label,
+  labelIcon,
+  description,
+  field,
+  children,
+}: FormItemWrapperProps<T>) {
+  const { error } = useFormField();
+  return (
+    <FormItem className="pt-2">
+      {label && (
+        <FormLabel className="flex gap-2 py-2 font-semibold">
+          {label}
+          {labelIcon && labelIcon}
+        </FormLabel>
+      )}
+      {description && (
+        <FormDescription className="pt-1 pb-2 text-xs">
+          {description}
+        </FormDescription>
+      )}
+
+      <FormControl>
+        {children(field as ControllerRenderProps<T, Path<T>>)}
+      </FormControl>
+      <div
+        className={cn(
+          "my-0.5 transition-opacity duration-500",
+          error ? "opacity-100" : "opacity-0 h-6"
+        )}
+      >
+        <FormMessage className="inline bg-red-50 px-2 py-1 rounded-md font-semibold text-xs" />
+      </div>
+    </FormItem>
+  );
+}

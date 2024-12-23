@@ -1,7 +1,7 @@
 "use server";
 
-import { SchemaResetPassword } from "@/types/schema-reset-password";
-import type { TypeApiResponse } from "@/types/type-api-response";
+import type { ApiResponseType } from "@/types/api-response-type";
+import { PasswordResetSchema } from "@/types/password-reset-schema";
 import { eq } from "drizzle-orm";
 import { actionClient } from ".";
 import { db } from "..";
@@ -10,8 +10,8 @@ import { sendTokenToEmail } from "./send-token-to-email";
 import { generateResetPasswordToken } from "./tokens";
 
 export const resetPassword = actionClient
-  .schema(SchemaResetPassword)
-  .action(async ({ parsedInput: { email } }) => {
+  .schema(PasswordResetSchema)
+  .action(async ({ parsedInput: { email } }): Promise<ApiResponseType> => {
     try {
       // --- is user in database?
       const existingUser = await db.query.users.findFirst({
@@ -20,34 +20,35 @@ export const resetPassword = actionClient
 
       if (!existingUser) {
         return {
-          status: ["error"],
+          status: "error",
           message: "User not found",
-        } as TypeApiResponse;
+        };
       }
 
       const resetPasswordToken = await generateResetPasswordToken(email);
 
       if (!resetPasswordToken) {
         return {
-          status: ["error"],
+          status: "error",
           message: "Token not generated. Try one more time",
-        } as TypeApiResponse;
+        };
       }
 
       sendTokenToEmail(
         resetPasswordToken[0].email,
         resetPasswordToken[0].token,
-        "/auth/new-password",
-        "Reset Password",
-        "to change your password."
+        "/new-password",
+        "Password Reset",
+        "resetting"
       );
 
       return {
-        status: ["success"],
+        status: "success",
         message: "Instructions sent to your email",
-        data: { redirect: "/" },
-      } as TypeApiResponse;
+        payload: { redirect: "/" },
+      };
     } catch (error) {
       console.error(error);
+      return { status: "error", message: `Something went wrong: ${error}` };
     }
   });

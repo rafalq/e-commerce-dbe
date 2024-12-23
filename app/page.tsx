@@ -17,9 +17,15 @@ export default async function Home() {
   });
 
   const allTags: string[] = [];
-  const variantsTagsArr = productsData.map((product) => product.variantTags);
-  const tagsArr = variantsTagsArr.map((item) => item.map((i) => i.tag));
-  tagsArr.forEach((item) => item.map((tag) => allTags.push(tag)));
+
+  productsData.map((product) =>
+    product.variantTags
+      .map((item) => item)
+      .map((i) => i.tag)
+      .map((item) => item)
+      .forEach((tag) => allTags.push(tag))
+  );
+
   const uniqueTags = Array.from(new Set(allTags));
 
   return (

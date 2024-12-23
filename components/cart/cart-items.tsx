@@ -60,7 +60,6 @@ export default function CartItems() {
           </motion.div>
           <Button
             size="lg"
-            variant="minDefault"
             onClick={() => {
               setCheckoutProgress("payment-page");
             }}

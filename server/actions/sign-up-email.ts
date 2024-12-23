@@ -1,6 +1,6 @@
 "use server";
 
-import { SchemaSignUp } from "@/types/schema-sign-up";
+import { SignUpSchema } from "@/types/sign-up-schema";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import { actionClient } from ".";
@@ -9,18 +9,19 @@ import { users } from "../schema";
 import { sendTokenToEmail } from "./send-token-to-email";
 import { generateEmailVerificationToken } from "./tokens";
 import Stripe from "stripe";
+import type { ApiResponseType } from "@/types/api-response-type";
 
 export const signUpEmail = actionClient
-  .schema(SchemaSignUp)
+  .schema(SignUpSchema)
   .action(
     async ({
       parsedInput: { name, email, password, passwordConfirmation },
-    }) => {
+    }): Promise<ApiResponseType> => {
       // --- do password and passwordConfirmation match?
       if (password !== passwordConfirmation) {
         return {
-          status: ["error"],
-          message: "Passwords do not match.",
+          status: "error",
+          message: "Passwords do not match",
         };
       }
 
@@ -40,18 +41,17 @@ export const signUpEmail = actionClient
             verificationToken[0].email,
             verificationToken[0].token,
             "/auth/email-verification",
-            "E-commerce DBE Confirmation Email",
-            "to confirm your email"
+            "E-commerce DBE Confirmation Email"
           );
 
           return {
-            status: ["success"],
-            message: "Verification token sent to your email.",
+            status: "success",
+            message: "Verification token sent to your email",
           };
         }
         return {
-          status: ["error"],
-          message: "Email already in use.",
+          status: "error",
+          message: "Email already in use",
         };
       }
 
@@ -76,13 +76,12 @@ export const signUpEmail = actionClient
         verificationToken[0].email,
         verificationToken[0].token,
         "/auth/email-verification",
-        "E-commerce DBE Confirmation Email",
-        "to confirm your email."
+        "E-commerce DBE Confirmation Email"
       );
 
       return {
-        status: ["success"],
-        message: "Verification token sent to your email.",
+        status: "success",
+        message: "Verification token sent to your email",
       };
     }
   );

@@ -59,13 +59,13 @@ export default async function ProductPage({
     return (
       <div className="max-w-6xl">
         <div className="flex md:flex-row flex-col justify-between gap-4 md:gap-12 p-4 w-full">
-          <div className="flex flex-col md:w-2/3">
+          <div className="flex flex-col md:w-3/5">
             <ProductVariantShowcase
               variants={variant.product.productVariants}
             />
           </div>
 
-          <div className="flex flex-col md:place-content-start md:w-1/3">
+          <div className="flex flex-col md:place-content-start md:w-2/5">
             <h1 className="font-bold text-4xl">{variant?.product.title}</h1>
             <div className="flex flex-col gap-2">
               <ProductVariant variants={variant.product.productVariants} />

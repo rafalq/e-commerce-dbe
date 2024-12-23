@@ -1,44 +1,47 @@
 "use server";
 
-import { SchemaNewPassword } from "@/types/schema-new-password";
+import { NewPasswordSchema } from "@/types/new-password-schema";
 import { actionClient } from ".";
 import {
   generateEmailVerificationToken,
   getResetPasswordTokenByToken,
 } from "./tokens";
-import { resetPasswordTokens, users } from "../schema";
+import { resetPasswordTokens, users } from "@/server/schema";
 import { eq } from "drizzle-orm";
 import { db } from "..";
-import { sendTokenToEmail } from "./send-token-to-email";
+import { sendTokenToEmail } from "@/server/actions/send-token-to-email";
 import bcrypt from "bcrypt";
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import type { ApiResponseType } from "@/types/api-response-type";
 
 export const newPassword = actionClient
-  .schema(SchemaNewPassword)
+  .schema(NewPasswordSchema)
   .action(
-    async ({ parsedInput: { password, passwordConfirmation, token } }) => {
+    async ({
+      parsedInput: { password, passwordConfirmation, token },
+    }): Promise<ApiResponseType> => {
       try {
         const pool = new Pool({ connectionString: process.env.NEON_DB_URL });
         const dbPool = drizzle(pool);
 
         // --- has token?
         if (!token) {
-          return { status: ["error"], message: "Missing token." };
+          return { status: "error", message: "Missing token." };
         }
 
         // --- has token or is token valid?
         const existingToken = await getResetPasswordTokenByToken(token);
 
         if (!existingToken || "status" in existingToken) {
-          return { status: ["error"], message: "Token not found." };
+          return { status: "error", message: "Token not found." };
         } else {
           // --- did token expire?
           const hasExpired = new Date(existingToken.expires) < new Date();
 
           if (hasExpired)
             return {
-              status: ["error"],
+              status: "error",
               message:
                 'Token has expired. Get a new one by clicking "Forgot password" link.',
             };
@@ -51,7 +54,7 @@ export const newPassword = actionClient
 
         if (!existingUser) {
           return {
-            status: ["error"],
+            status: "error",
             message: "User not found. Sign up first.",
           };
         } else {
@@ -63,15 +66,15 @@ export const newPassword = actionClient
             await sendTokenToEmail(
               verificationToken[0].email,
               verificationToken[0].token,
-              "/auth/verification",
+              "/verification",
               "E-commerce DBE Confirmation Email",
-              "to confirm your email"
+              "verification"
             );
 
             return {
-              status: ["success"],
+              status: "success",
               message: "Verification token sent to your email.",
-              data: { redirect: "/" },
+              payload: { redirect: "/" },
             };
           }
         }
@@ -79,7 +82,7 @@ export const newPassword = actionClient
         // --- do password and passwordConfirmation match?
         if (password !== passwordConfirmation) {
           return {
-            status: ["error"],
+            status: "error",
             message: "Passwords do not match.",
           };
         }
@@ -99,12 +102,13 @@ export const newPassword = actionClient
         });
 
         return {
-          status: ["success"],
+          status: "success",
           message: "Password updated successfully!",
-          data: { redirect: "/auth/sign-in" },
+          payload: { redirect: "/sign-in" },
         };
       } catch (error) {
         console.error(error);
+        return { status: "error", message: `Something went wrong: ${error}` };
       }
     }
   );

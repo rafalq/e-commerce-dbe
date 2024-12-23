@@ -1,6 +1,7 @@
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import CustomAvatarFallback from "@/components/ui/custom/avatar-fallback";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,24 +11,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { signOut } from "next-auth/react";
 import { LoaderCircle, LogOut, Moon, Settings, Sun, Truck } from "lucide-react";
 import { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import CustomAvatarFallback from "../ui/custom-avatar-fallback";
+import { Suspense, useCallback, useEffect, useState } from "react";
 
 export default function ButtonUser({ user }: Session) {
-  const { setTheme, theme, resolvedTheme } = useTheme(); // Get resolvedTheme to check the system preference
   const [isChecked, setIsChecked] = useState(false);
+  // Get resolvedTheme to check the system preference
+  const { setTheme, theme, resolvedTheme } = useTheme();
 
   const router = useRouter();
 
+  const handleTheme = useCallback(() => {
+    if (resolvedTheme === "dark") {
+      setIsChecked(true);
+    } else {
+      setIsChecked(false);
+    }
+  }, [resolvedTheme]);
+
   useEffect(() => {
     handleTheme();
-  }, [resolvedTheme]);
+  }, [handleTheme, resolvedTheme]);
 
   function handleCheckedChange(e: boolean) {
     setIsChecked(e);
@@ -36,14 +45,6 @@ export default function ButtonUser({ user }: Session) {
       setTheme("dark");
     } else {
       setTheme("light");
-    }
-  }
-
-  function handleTheme() {
-    if (resolvedTheme === "dark") {
-      setIsChecked(true);
-    } else {
-      setIsChecked(false);
     }
   }
 
@@ -93,7 +94,6 @@ export default function ButtonUser({ user }: Session) {
           onClick={() => router.push("/dashboard/settings")}
           className="p-3 cursor-pointer group"
         >
-          {" "}
           <DropdownMenuItemContent
             icon={
               <Settings className="group-hover:rotate-180 w-4 h-4 transition-all duration-300 ease-in-out" />
@@ -117,7 +117,7 @@ export default function ButtonUser({ user }: Session) {
             icon={
               <LogOut className="group-hover:scale-110 w-4 h-4 transition-all duration-300 ease-in-out" />
             }
-            text="Sign out"
+            text="SIGN OUT"
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -141,7 +141,7 @@ function DropdownMenuItemContent({
   return (
     <div className={cn(className)}>
       <div>
-        <p className="flex items-center gap-3">
+        <p className="flex justify-center items-center gap-4 w-full">
           {icon && icon}
           <span className="font-medium">{text}</span>
         </p>

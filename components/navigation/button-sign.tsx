@@ -6,27 +6,28 @@ import { FaUserPlus } from "react-icons/fa";
 import { PiSignIn } from "react-icons/pi";
 
 import { Button } from "@/components/ui/button";
+import { AUTH_PATHS } from "@/app/(auth)/const";
 
 export default function ButtonSign() {
   const currentPath = usePathname();
 
   if (
-    currentPath !== "/auth/sign-in" ||
-    currentPath === ("/auth/sign-up" as string)
+    currentPath !== AUTH_PATHS.signIn ||
+    currentPath === (AUTH_PATHS.signUp as string)
   ) {
     return (
       <ButtonAuthNav
-        linkHref={"/auth/sign-in"}
-        buttonTitle={"Sign In"}
-        icon={<PiSignIn className="w-5 h-5" />}
+        linkHref={AUTH_PATHS.signIn}
+        buttonTitle="SIGN IN"
+        icon={<PiSignIn className="w-4 h-4" />}
       />
     );
   } else {
     return (
       <ButtonAuthNav
-        linkHref={"/auth/sign-up"}
-        buttonTitle={"Sign Up"}
-        icon={<FaUserPlus className="w-5 h-5" />}
+        linkHref={AUTH_PATHS.signUp}
+        buttonTitle="SIGN UP"
+        icon={<FaUserPlus className="w-4 h-4" />}
       />
     );
   }
@@ -40,11 +41,11 @@ type ButtonAuthNavProps = {
 
 function ButtonAuthNav({ linkHref, buttonTitle, icon }: ButtonAuthNavProps) {
   return (
-    <Button>
+    <Button className="px-6">
       <Link aria-label="sign-in" href={linkHref}>
-        <div className="flex gap-2">
+        <div className="flex justify-center items-center gap-2">
           <span>{buttonTitle}</span>
-          {icon && icon}
+          {icon && <span>{icon}</span>}
         </div>
       </Link>
     </Button>

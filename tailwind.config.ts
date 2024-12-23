@@ -68,6 +68,18 @@ const config: Config = withUt({
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        slideDown: {
+          "0%": { transform: "translateY(-100%)" },
+          "50%": { transform: "translateY(-50%)" },
+          "100%": { transform: "translateY(0%)" },
+        },
+        slideUp: {
+          "0%": { transform: "translateY(0%)" },
+          "50%": { transform: "translateY(-50%)" },
+          "100%": { transform: "translateY(-100%)" },
+        },
+      },
     },
   },
   // eslint-disable-next-line @typescript-eslint/no-require-imports

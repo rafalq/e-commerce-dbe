@@ -26,7 +26,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import type { Session } from "next-auth";
 import { hasChanges } from "@/lib/has-changes";
-import CustomAvatarFallback from "@/components/ui/custom-avatar-fallback";
+import CustomAvatarFallback from "@/components/ui/custom/avatar-fallback";
 
 type FormSettings = {
   session: Session;

@@ -1,15 +1,16 @@
-import bcrypt from "bcrypt";
-import { accounts, users } from "./schema";
-import NextAuth from "next-auth";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@/server";
-import Google from "next-auth/providers/google";
-import Github from "next-auth/providers/github";
-import type { Adapter } from "next-auth/adapters";
-import Credentials from "next-auth/providers/credentials";
-import { SchemaSignIn } from "@/types/schema-sign-in";
+import { SignInSchema } from "@/types/sign-in-schema";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+// import Github from "next-auth/providers/github";
+import Google from "next-auth/providers/google";
 import Stripe from "stripe";
+import { accounts, users } from "./schema";
+
+import type { Adapter } from "next-auth/adapters";
 
 type User = {
   id: string;
@@ -17,8 +18,9 @@ type User = {
   email: string | null;
   image?: string | null;
   emailVerified?: Date | null;
-  role?: string | null; // Add other fields expected by NextAuth, except for sensitive ones like password
+  role?: string | null;
   customerId: string | null;
+  // Add other fields expected by NextAuth, except for sensitive ones like password
 };
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -64,6 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   secret: process.env.AUTH_SECRET!,
+  // maxAge - set jwt expiration date (maxAge: 30 * 24 * 60 * 60)
   session: { strategy: "jwt" },
   events: {
     createUser: async ({ user }) => {
@@ -88,14 +91,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
     }),
-    Github({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
-    }),
+    // Github({
+    //   clientId: process.env.GITHUB_CLIENT_ID!,
+    //   clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    //   allowDangerousEmailAccountLinking: true,
+    // }),
     Credentials({
       authorize: async (credentials) => {
-        const validatedFields = SchemaSignIn.safeParse(credentials);
+        const validatedFields = SignInSchema.safeParse(credentials);
 
         if (validatedFields.success) {
           const { email, password } = validatedFields.data;

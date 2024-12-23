@@ -36,12 +36,12 @@ export default function RootLayout({
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex flex-col justify-center items-center mx-auto min-h-screen">
+          <div className="relative flex flex-col min-h-screen">
             <header className="w-full">
               <Nav />
             </header>
-            <main className="flex flex-col gap-4 mx-auto p-4">{children}</main>
-            <footer className="bg-primary/30 mt-auto p-4 w-full" />
+            <main className="mx-auto p-8">{children}</main>
+            <footer className="bottom-0 absolute bg-primary/30 p-4 w-full" />
           </div>
           <Toaster richColors closeButton expand={true} />
         </ThemeProvider>

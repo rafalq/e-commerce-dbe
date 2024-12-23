@@ -1,6 +1,5 @@
 "use server";
 
-import { eq } from "drizzle-orm";
 import { db } from "@/server/index";
 import {
   resetPasswordTokens,
@@ -8,8 +7,9 @@ import {
   users,
   verificationTokens,
 } from "@/server/schema";
+import type { ApiResponseType } from "@/types/api-response-type";
 import { randomInt } from "crypto";
-import type { TypeApiResponse } from "@/types/type-api-response";
+import { eq } from "drizzle-orm";
 
 // --- email verification ---
 
@@ -54,47 +54,51 @@ export async function generateEmailVerificationToken(email: string) {
   return verificationToken;
 }
 
-export async function verifyEmail(token: string) {
-  const existingToken = await db.query.verificationTokens.findFirst({
-    where: eq(verificationTokens.token, token),
-  });
+export async function verifyEmail(token: string): Promise<ApiResponseType> {
+  try {
+    const existingToken = await db.query.verificationTokens.findFirst({
+      where: eq(verificationTokens.token, token),
+    });
 
-  if (!existingToken)
-    return { status: ["error"], message: "Token not found" } as TypeApiResponse;
+    if (!existingToken) return { status: "error", message: "Token not found" };
 
-  const hasExpired = new Date(existingToken.expires) < new Date();
+    const hasExpired = new Date(existingToken.expires) < new Date();
 
-  if (hasExpired)
+    if (hasExpired)
+      return {
+        status: "error",
+        message: "Token has expired",
+      };
+
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, existingToken.email),
+    });
+
+    if (!existingUser)
+      return {
+        status: "error",
+        message: "Email does not exist",
+      };
+
+    await db
+      .update(users)
+      .set({
+        emailVerified: new Date(),
+      })
+      .where(eq(users.email, existingToken.email));
+
+    await db
+      .delete(verificationTokens)
+      .where(eq(verificationTokens.email, existingToken.email));
+
     return {
-      status: ["error"],
-      message: "Token has expired",
-    } as TypeApiResponse;
-
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.email, existingToken.email),
-  });
-
-  if (!existingUser)
-    return {
-      status: ["error"],
-      message: "Email does not exist",
-    } as TypeApiResponse;
-
-  await db
-    .update(users)
-    .set({
-      emailVerified: new Date(),
-    })
-    .where(eq(users.email, existingToken.email));
-
-  await db
-    .delete(verificationTokens)
-    .where(eq(verificationTokens.email, existingToken.email));
-
-  return {
-    status: ["success"],
-    message: "Email verified successfully!",
-  } as TypeApiResponse;
+      status: "success",
+      message: "Email verified successfully!",
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: `Something went wrong: ${error}` };
+  }
 }
 
 // ---- reset password ---
@@ -141,9 +145,9 @@ export async function getResetPasswordTokenByToken(token: string) {
     return resetPasswordToken;
   } catch (error) {
     return {
-      status: ["error"],
+      status: "error",
       message: error || "Token not found.",
-    } as TypeApiResponse;
+    };
   }
 }
 

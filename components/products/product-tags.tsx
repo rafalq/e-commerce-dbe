@@ -27,8 +27,8 @@ export default function ProductTags({
       <Badge
         onClick={() => setFilter("")}
         className={cn(
-          "cursor-pointer bg-black hover:bg-black/75 hover:opacity-100",
-          !tag ? "opacity-100" : "opacity-50"
+          "cursor-pointer bg-primary-foreground text-primary border border-primary hover:bg-secondary transition-all duration-300 ease-in-out",
+          !tag && "bg-primary/95 text-primary-foreground hover:bg-primary/100"
         )}
       >
         All
@@ -38,8 +38,10 @@ export default function ProductTags({
           key={vTag}
           onClick={() => setFilter(vTag)}
           className={cn(
-            "cursor-pointer bg-primary text-primary-foreground hover:opacity-100",
-            tag === vTag && tag ? "opacity-100" : "opacity-50"
+            "cursor-pointer bg-primary-foreground text-primary border border-primary hover:bg-secondary transition-all duration-300 ease-in-out",
+            tag === vTag &&
+              tag &&
+              "bg-primary/95 text-primary-foreground hover:bg-primary/100"
           )}
           //   style={{ backgroundColor: createRandomColor() }}
         >

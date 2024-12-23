@@ -8,6 +8,7 @@ import { useMemo, useState } from "react";
 import { Hits, SearchBox } from "react-instantsearch";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
 import { Card } from "@/components/ui/card";
+import { Search } from "lucide-react";
 
 function Hit({
   hit,
@@ -107,6 +108,9 @@ export default function Algolia() {
             resetIcon: "hidden",
           }}
         />
+        {!active && (
+          <Search className="top-1.5 right-2 absolute w-5 h-5 text-primary/80" />
+        )}
         <AnimatePresence>
           {active && (
             <MCard

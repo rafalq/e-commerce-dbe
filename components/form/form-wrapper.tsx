@@ -1,6 +1,6 @@
 "use client";
 
-import SocialsAuth from "@/app/auth/_components/socials-auth";
+import SocialsAuth from "@/app/(auth)/_components/socials-auth";
 import CustomButtonLink from "@/components/ui/custom-button-link";
 import CustomButtonSubmit from "@/components/ui/custom-button-submit";
 import FormCard from "@/components/ui/custom-card-wrapper";

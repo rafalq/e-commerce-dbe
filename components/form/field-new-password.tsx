@@ -1,4 +1,4 @@
-import FormFieldWrapper from "@/components/form/form-field-wrapper";
+import FormFieldWrapper from "@/components/form/form-field-box";
 import CustomInputPassword from "@/components/ui/custom-input-password";
 import type { TypeSchemaNewPassword } from "@/types/schema-new-password";
 import type { HookActionStatus } from "next-safe-action/hooks";

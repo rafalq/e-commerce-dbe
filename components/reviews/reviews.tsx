@@ -34,17 +34,17 @@ export default async function Reviews({ productId }: { productId: number }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex md:flex-row flex-col gap-4">
-        <div className="flex flex-col flex-1 gap-4 h-full">
+        <div className="flex flex-col gap-4 w-3/5 h-full">
           <h3 className="w-full font-semibold text-3xl">Customers Reviews</h3>
+          {data.length > 0 && <ReviewChart reviews={data} />}
+        </div>
+        <div className="flex flex-col gap-4 w-2/5 h-full">
+          {session && <FormReviews />}
           {data.length > 0 && (
-            <div className="h-[273px]">
+            <div className="h-[266px]">
               <ReviewDetails review={dataOnlyLast} />
             </div>
           )}
-        </div>
-        <div className="flex flex-col flex-1 gap-4 h-full">
-          {session && <FormReviews />}
-          {data.length > 0 && <ReviewChart reviews={data} />}
         </div>
       </div>
       {data.length > 0 ? (

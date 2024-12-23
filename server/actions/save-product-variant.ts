@@ -44,9 +44,7 @@ export const saveProductVariant = actionClient
 
         if (!product) throw new Error("Product not found");
 
-        const dbTypes: Record<string, string[]> = (
-          await getTypeWithValues(productId)
-        ).data;
+        const dbTypes = (await getTypeWithValues(productId)).data;
 
         if (!isEmpty(dbTypes) && type in dbTypes) {
           const updatedDbTypes = Array.from(new Set([...dbTypes[type], value]));
