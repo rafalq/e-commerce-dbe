@@ -1,11 +1,14 @@
 export default function TwoFactorEmail({ token }: { token: string }) {
   return (
     <>
-      <h3>Verification Code</h3>
+      <h3>Confirmation Code</h3>
 
       <p>
-        Enter the code below to login to <strong>{process.env.APP_NAME}</strong>
-        . This code can only be used once and expires in 10 minutes.
+        Enter the code below to sign in to{" "}
+        <strong>{process.env.APP_NAME}</strong>.
+      </p>
+      <p>
+        This code can only be used once and expires in <strong>1 hour</strong>.
       </p>
 
       <div
@@ -19,9 +22,10 @@ export default function TwoFactorEmail({ token }: { token: string }) {
         {token}
       </div>
 
-      <p>Did not try to login? Please, ignore this message.</p>
-
-      <p>If the code is expired, try to login again.</p>
+      <p>Did not try to sign in? Please, ignore this message.</p>
+      <p>
+        - <strong>{process.env.APP_NAME}</strong>
+      </p>
     </>
   );
 }

@@ -31,7 +31,7 @@ export async function handleTwoFactorToken(
   await sendTwoFactorTokenToEmail(
     token[0].email,
     token[0].token,
-    "E-commerce DBE Two Factor Authentication Confirmation"
+    `${process.env.APP_NAME} Confirmation Code`
   );
   return apiResponse;
 }
@@ -104,7 +104,7 @@ export const signInEmail = actionClient
             verificationToken[0].email,
             verificationToken[0].token,
             "/email-verification",
-            `${process.env.APP_NAME} Email Confirmation`,
+            `${process.env.APP_NAME} Email Verification`,
             "verification"
           );
 
@@ -154,7 +154,7 @@ export const signInEmail = actionClient
                 message: "New confirmation code sent to your email",
               };
             } else {
-              // If no code was entered but a confirmation token in in the database, notify the user to check their email
+              // If no code was entered but a confirmation token is in the database, notify the user to check their email
               return {
                 status: "two-factor-info",
                 message:

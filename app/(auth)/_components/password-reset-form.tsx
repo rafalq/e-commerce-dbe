@@ -17,7 +17,7 @@ import { SendHorizonal } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AUTH_PATHS } from "../const";
+import { AUTH_PATHS } from "@/app/(auth)/_const/auth-paths";
 import { useRouter } from "next/navigation";
 
 export default function PasswordResetForm() {

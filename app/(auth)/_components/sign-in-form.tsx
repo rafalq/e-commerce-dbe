@@ -2,7 +2,7 @@
 
 import { CardAuth } from "@/app/(auth)/_components/card-auth";
 import FormFieldWrapper from "@/components/form/form-field-wrapper";
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import CustomLink from "@/components/ui/custom/custom-link";
 import InputCode from "@/components/ui/custom/input-code";
 import InputPassword from "@/components/ui/custom/input-password";
@@ -17,7 +17,7 @@ import { CircleCheckBig, LogIn } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AUTH_PATHS } from "../const";
+import { AUTH_PATHS } from "@/app/(auth)/_const/auth-paths";
 
 export default function SignInForm() {
   const form = useForm<SignInSchemaType>({
@@ -53,12 +53,12 @@ export default function SignInForm() {
 
   function handleResendCode() {
     const values: SignInSchemaType = {
-      email: form.getValues('email'),
-      password: form.getValues('password'),
-      code: 'resend'
-    }
-    execute(values)
-  };
+      email: form.getValues("email"),
+      password: form.getValues("password"),
+      code: "resend",
+    };
+    execute(values);
+  }
 
   return (
     <section>
@@ -70,7 +70,7 @@ export default function SignInForm() {
             {result.data?.status.includes("two-factor") ? (
               <>
                 <CodeField status={status} />
-                <ResendCode onClick={handleResendCode}/>
+                <ResendCode onClick={handleResendCode} />
                 <SubmitButton status={status} title="verify">
                   <CircleCheckBig className="w-4 h-4" />
                 </SubmitButton>
@@ -147,11 +147,12 @@ function SignUpLink() {
   );
 }
 
-
-function ResendCode({onClick}: {onClick: () => void}) {
+function ResendCode({ onClick }: { onClick: () => void }) {
   return (
     <div className="flex flex-row-reverse mb-6 w-full">
-      <Button type='button' variant='link' onClick={onClick}>Resend Code</Button>
+      <Button type="button" variant="link" onClick={onClick}>
+        Resend Code
+      </Button>
     </div>
   );
 }

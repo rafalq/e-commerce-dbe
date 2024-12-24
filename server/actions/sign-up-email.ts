@@ -41,7 +41,8 @@ export const signUpEmail = actionClient
             verificationToken[0].email,
             verificationToken[0].token,
             "/auth/email-verification",
-            "E-commerce DBE Confirmation Email"
+            `${process.env.APP_NAME} Confirmation Email`,
+            "verification"
           );
 
           return {
@@ -76,7 +77,8 @@ export const signUpEmail = actionClient
         verificationToken[0].email,
         verificationToken[0].token,
         "/auth/email-verification",
-        "E-commerce DBE Confirmation Email"
+        `${process.env.APP_NAME} Confirmation Email`,
+        "verification"
       );
 
       return {

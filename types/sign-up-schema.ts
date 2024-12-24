@@ -1,4 +1,4 @@
-import { patterns } from "@/app/(auth)/_const/patterns";
+import { PATTERNS } from "@/app/(auth)/_const/patterns";
 import * as z from "zod";
 
 export const SignUpSchema = z
@@ -10,19 +10,19 @@ export const SignUpSchema = z
     password: z
       .string({ required_error: "Password is required" })
       .min(8, { message: "Password needs minimum 8 characters" })
-      .refine((text) => patterns.password.noSpace.test(text), {
+      .refine((text) => PATTERNS.password.noSpace.test(text), {
         message: "Password can not include any blank space",
       })
-      .refine((text) => patterns.password.lowercase.test(text), {
+      .refine((text) => PATTERNS.password.lowercase.test(text), {
         message: "Password must include at least one lowercase English letter",
       })
-      .refine((text) => patterns.password.uppercase.test(text), {
+      .refine((text) => PATTERNS.password.uppercase.test(text), {
         message: "Password must include at least one uppercase English letter",
       })
-      .refine((text) => patterns.password.digit.test(text), {
+      .refine((text) => PATTERNS.password.digit.test(text), {
         message: "Password must include at least one digit",
       })
-      .refine((text) => patterns.password.symbol.test(text), {
+      .refine((text) => PATTERNS.password.symbol.test(text), {
         message: "Password must include at least one special character",
       }),
     passwordConfirmation: z

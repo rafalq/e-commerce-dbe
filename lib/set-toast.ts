@@ -19,7 +19,7 @@ export function setToast(res: ApiResponseType) {
       toast.error(resMsg || "Operation done successfully");
       break;
     case "two-factor-info":
-      toast.success(resMsg || "No info provided");
+      toast.info(resMsg || "No info provided");
       break;
     case "two-factor-success":
       toast.success(resMsg || "Operation done successfully");

@@ -6,7 +6,7 @@ import { FaUserPlus } from "react-icons/fa";
 import { PiSignIn } from "react-icons/pi";
 
 import { Button } from "@/components/ui/button";
-import { AUTH_PATHS } from "@/app/(auth)/const";
+import { AUTH_PATHS } from "@/app/(auth)/_const/auth-paths";
 
 export default function ButtonSign() {
   const currentPath = usePathname();
