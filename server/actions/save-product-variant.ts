@@ -8,8 +8,8 @@ import {
   variantTags,
   variantTypes,
 } from "@/server/schema";
-import { SchemaProductVariant } from "@/types/schema-product-variant";
-import type { TypeApiResponse } from "@/types/type-api-response";
+import type { ApiResponseType } from "@/types/api-response-type";
+import { ProductVariantSchema } from "@/types/product-variant-schema";
 import { algoliasearch } from "algoliasearch";
 import { eq } from "drizzle-orm";
 import { isEmpty } from "lodash";
@@ -23,7 +23,7 @@ const clientAlgolia = algoliasearch(
 );
 
 export const saveProductVariant = actionClient
-  .schema(SchemaProductVariant)
+  .schema(ProductVariantSchema)
   .action(
     async ({
       parsedInput: {
@@ -36,7 +36,7 @@ export const saveProductVariant = actionClient
         productId,
         editMode,
       },
-    }) => {
+    }): Promise<ApiResponseType | undefined> => {
       try {
         const product = await db.query.products.findFirst({
           where: eq(products.id, productId),
@@ -124,9 +124,9 @@ export const saveProductVariant = actionClient
           revalidatePath("/");
 
           return {
-            status: ["success"],
+            status: "success",
             message: `Updated "${title}" successfully!`,
-          } satisfies TypeApiResponse;
+          };
         }
 
         if (!editMode) {
@@ -182,14 +182,14 @@ export const saveProductVariant = actionClient
           revalidatePath("/");
 
           return {
-            status: ["success"],
+            status: "success",
             message: `Added ${title} successfully!`,
-          } satisfies TypeApiResponse;
+          };
         }
       } catch (error) {
         console.error(error);
         return {
-          status: ["error"],
+          status: "error",
           message: "Failed to save variant",
         };
       }

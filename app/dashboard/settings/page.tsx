@@ -1,6 +1,6 @@
+import SettingsForm from "@/app/dashboard/settings/_components/settings-form";
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
-import { FormSettings } from "./_components/form-settings";
 
 export default async function SettingsPage() {
   const session = await auth();
@@ -8,6 +8,6 @@ export default async function SettingsPage() {
   if (!session) {
     redirect("/");
   } else {
-    return <FormSettings session={session} />;
+    return <SettingsForm session={session} />;
   }
 }

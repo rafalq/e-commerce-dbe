@@ -1,21 +1,20 @@
 import { Button } from "@/components/ui/button";
-import type { HookActionStatus } from "next-safe-action/hooks";
 import Loader from "@/components/ui/custom/loader";
 
 type SubmitButtonProps = {
-  status: HookActionStatus;
+  isLoading: boolean;
   title?: string;
   children?: React.ReactNode;
 };
 
 export default function SubmitButton({
-  status,
+  isLoading,
   title,
   children,
 }: SubmitButtonProps) {
   return (
-    <Button type="submit" disabled={status === "executing"} className="w-full">
-      {status === "executing" ? (
+    <Button type="submit" disabled={isLoading} className="w-full">
+      {isLoading ? (
         <Loader size={8} />
       ) : (
         <>

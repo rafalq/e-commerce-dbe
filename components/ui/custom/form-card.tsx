@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import ButtonBack from "@/components/ui/custom/button-back";
 
-type CardAuthProps = {
+type FormCardProps = {
   cardTitle?: string;
   cardDescription?: string;
   children: React.ReactNode;
@@ -16,13 +16,13 @@ type CardAuthProps = {
   buttonBackHref?: string;
 };
 
-export const CardAuth = ({
+export default function FormCard({
   cardTitle,
   cardDescription,
   children,
   buttonBackHref,
   buttonBackLabel,
-}: CardAuthProps) => {
+}: FormCardProps) {
   return (
     <Card className="bg-primary-foreground/50 shadow mt-8 mb-12 p-4 w-full md:w-[420px]">
       <CardHeader>
@@ -46,4 +46,4 @@ export const CardAuth = ({
       </CardFooter>
     </Card>
   );
-};
+}

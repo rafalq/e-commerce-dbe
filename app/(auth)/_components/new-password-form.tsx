@@ -7,6 +7,7 @@ import SubmitButton from "@/components/ui/custom/submit-button";
 import { Form } from "@/components/ui/form";
 import { setToast } from "@/lib/set-toast";
 import { newPassword } from "@/server/actions/new-password";
+import type { ApiResponseType } from "@/types/api-response-type";
 import {
   NewPasswordSchema,
   type NewPasswordSchemaType,
@@ -42,9 +43,12 @@ export default function NewPasswordForm() {
     },
     onSuccess(data) {
       toast.dismiss();
-      setToast(data.data!);
-      if (data.data?.payload?.redirect) {
-        router.push(data.data?.payload.redirect);
+      setToast(data.data as ApiResponseType);
+      if (data.data?.payload && typeof data.data.payload === "object") {
+        const payload = data.data.payload as { redirect: string };
+        if (payload.redirect) {
+          router.push(payload.redirect);
+        }
       }
     },
     onError() {
@@ -65,7 +69,10 @@ export default function NewPasswordForm() {
             <PasswordField status={status} />
             <PasswordConfirmationField status={status} />
             <div className="mt-8">
-              <SubmitButton status={status} title="change password">
+              <SubmitButton
+                isLoading={status === "executing"}
+                title="change password"
+              >
                 <RefreshCcw className="w-4 h-4" />
               </SubmitButton>
             </div>

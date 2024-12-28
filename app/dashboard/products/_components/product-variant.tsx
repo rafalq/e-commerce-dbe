@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import FormSaveProductVariant from "@/app/dashboard/products/_components/form-save-product-variant";
+import SaveProductVariantForm from "@/app/dashboard/products/_components/save-product-variant-form";
 
 import type { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
 import { forwardRef, useState, type PropsWithRef } from "react";
@@ -29,17 +29,17 @@ const ProductVariant: React.FC<PropsWithRef<ProductVariantProps>> = forwardRef(
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger>{children}</DialogTrigger>
 
-        <DialogContent className="max-w-screen-sm max-h-[740px] md:max-h-[560px] scrollbarY">
+        <DialogContent className="md:w-[420px] max-w-screen-sm max-h-[740px] md:max-h-[500px] overflow-x-hidden scrollbarY">
           <div className="p-4">
             <DialogHeader className="pb-6">
-              <DialogTitle className="font-semibold text-3xl">
+              <DialogTitle className="font-semibold text-3xl text-center">
                 {editMode ? "Edit" : "Add"} Variant
               </DialogTitle>
-              <DialogDescription>
+              <DialogDescription className="text-center">
                 Manage the product variant here
               </DialogDescription>
             </DialogHeader>
-            <FormSaveProductVariant
+            <SaveProductVariantForm
               editMode={editMode}
               variant={variant}
               productId={productId}

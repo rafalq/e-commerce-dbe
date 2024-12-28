@@ -10,7 +10,9 @@ export default function Separator({ text }: SeparatorProps) {
       </div>
       {text && (
         <div className="relative flex justify-center">
-          <span className="bg-card px-4 text-primary text-sm">{text}</span>
+          <span className="bg-primary-foreground/50 px-4 text-primary text-sm">
+            {text}
+          </span>
         </div>
       )}
     </div>

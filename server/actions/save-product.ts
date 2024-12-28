@@ -1,76 +1,81 @@
 "use server";
 
-import { db } from "@/server/index";
-import { actionClient } from "@/server/actions/index";
-import { SchemaProduct } from "@/types/schema-product";
-import { eq } from "drizzle-orm";
-import { products } from "../schema";
-import { revalidatePath } from "next/cache";
 import { hasChanges } from "@/lib/has-changes";
+import { actionClient } from "@/server/actions/index";
+import { db } from "@/server/index";
+import type { ApiResponseType } from "@/types/api-response-type";
+import { ProductSchema } from "@/types/product-schema";
+import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { products } from "../schema";
 
 export const saveProduct = actionClient
-  .schema(SchemaProduct)
-  .action(async ({ parsedInput: { id, title, description, price } }) => {
-    try {
-      // --- check if 'edit mode'
+  .schema(ProductSchema)
+  .action(
+    async ({
+      parsedInput: { id, title, description, price },
+    }): Promise<ApiResponseType> => {
+      try {
+        // --- check if 'edit mode'
 
-      if (id) {
-        const currentProduct = await db.query.products.findFirst({
-          where: eq(products.id, id),
-        });
+        if (id) {
+          const currentProduct = await db.query.products.findFirst({
+            where: eq(products.id, id),
+          });
 
-        if (!currentProduct)
-          return { status: ["error"], message: "Product not found." };
+          if (!currentProduct)
+            return { status: "error", message: "Product not found." };
 
-        // --- if no changes made
+          // --- if no changes made
 
-        const hasUpdates = hasChanges({
-          currentData: currentProduct,
-          newData: { title, description, price },
-        });
+          const hasUpdates = hasChanges({
+            currentData: currentProduct,
+            newData: { title, description, price },
+          });
 
-        if (!hasUpdates) {
+          if (!hasUpdates) {
+            return {
+              status: "warning",
+              message: "No changes detected to update",
+            };
+          }
+
+          // --- else update the product
+
+          const editedProduct = await db
+            .update(products)
+            .set({ description, price, title })
+            .where(eq(products.id, id))
+            .returning();
+
+          revalidatePath("/dashboard/products");
+          revalidatePath("/");
+          revalidatePath("/products/[slug]", "page");
+
           return {
-            status: ["warning"],
-            message: "No changes detected to update",
+            status: "success",
+            message: `Product "${editedProduct[0].title}" updated successfully!`,
+          };
+
+          // --- if not, create product
+        } else {
+          const newProduct = await db
+            .insert(products)
+            .values({ title, description, price })
+            .returning();
+
+          revalidatePath("/dashboard/products");
+          revalidatePath("/");
+          revalidatePath("/products/[slug]", "page");
+
+          return {
+            status: "success",
+            message: `Product "${newProduct[0].title}" created successfully!`,
           };
         }
-
-        // --- else update the product
-
-        const editedProduct = await db
-          .update(products)
-          .set({ description, price, title })
-          .where(eq(products.id, id))
-          .returning();
-
-        revalidatePath("/dashboard/products");
-        revalidatePath("/");
-        revalidatePath("/products/[slug]", "page");
-
-        return {
-          status: ["success"],
-          message: `Product "${editedProduct[0].title}" updated successfully!`,
-        };
-
-        // --- if not, create product
-      } else {
-        const newProduct = await db
-          .insert(products)
-          .values({ title, description, price })
-          .returning();
-
-        revalidatePath("/dashboard/products");
-        revalidatePath("/");
-        revalidatePath("/products/[slug]", "page");
-
-        return {
-          status: ["success"],
-          message: `Product "${newProduct[0].title}" created successfully!`,
-        };
+      } catch (error) {
+        console.error(error);
+        return { status: "error", message: "Failed to save product." };
       }
-    } catch (error) {
-      console.error(error);
-      return { status: ["error"], message: "Failed to save product." };
     }
-  });
+  );

@@ -1,14 +1,15 @@
 "use client";
 
 import { CardAuth } from "@/app/(auth)/_components/card-auth";
+import { AUTH_PATHS } from "@/app/(auth)/_const/auth-paths";
+import TextField from "@/components/form/text-field";
 import FormFieldWrapper from "@/components/form/form-field-wrapper";
+import PasswordField from "@/components/form/password-field";
 import { Button } from "@/components/ui/button";
 import CustomLink from "@/components/ui/custom/custom-link";
-import InputCode from "@/components/ui/custom/input-code";
-import InputPassword from "@/components/ui/custom/input-password";
+import InputCode from "@/components/ui/custom/input-otp";
 import SubmitButton from "@/components/ui/custom/submit-button";
 import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { setToast } from "@/lib/set-toast";
 import { signInEmail } from "@/server/actions/sign-in-email";
 import { SignInSchema, type SignInSchemaType } from "@/types/sign-in-schema";
@@ -17,7 +18,6 @@ import { CircleCheckBig, LogIn } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { AUTH_PATHS } from "@/app/(auth)/_const/auth-paths";
 
 export default function SignInForm() {
   const form = useForm<SignInSchemaType>({
@@ -65,21 +65,31 @@ export default function SignInForm() {
       <CardAuth cardTitle="Sign in to your account" showSocials>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <EmailField status={status} />
+            <EmailField
+              status={status}
+              isDisabled={!!result.data?.status.includes("two-factor")}
+            />
 
             {result.data?.status.includes("two-factor") ? (
               <>
                 <CodeField status={status} />
                 <ResendCode onClick={handleResendCode} />
-                <SubmitButton status={status} title="verify">
+                <SubmitButton isLoading={status === "executing"} title="verify">
                   <CircleCheckBig className="w-4 h-4" />
                 </SubmitButton>
               </>
             ) : (
               <>
-                <PasswordField status={status} />
+                <PasswordField<SignInSchemaType>
+                  name="password"
+                  label="Password"
+                  status={status}
+                />
                 <ForgotLink />
-                <SubmitButton status={status} title="sign in">
+                <SubmitButton
+                  isLoading={status === "executing"}
+                  title="sign in"
+                >
                   <LogIn className="w-4 h-4" />
                 </SubmitButton>
                 <SignUpLink />
@@ -92,21 +102,19 @@ export default function SignInForm() {
   );
 }
 
-function EmailField({ status }: { status: HookActionStatus }) {
-  return (
-    <FormFieldWrapper<SignInSchemaType> name="email" label="Email">
-      {(field) => <Input {...field} disabled={status === "executing"} />}
-    </FormFieldWrapper>
-  );
-}
+type EmailFieldProps = {
+  status: HookActionStatus;
+  isDisabled: boolean;
+};
 
-function PasswordField({ status }: { status: HookActionStatus }) {
+function EmailField({ status, isDisabled }: EmailFieldProps) {
   return (
-    <FormFieldWrapper<SignInSchemaType> name="password" label="Password">
-      {(field) => (
-        <InputPassword {...field} disabled={status === "executing"} />
-      )}
-    </FormFieldWrapper>
+    <TextField<SignInSchemaType>
+      name="email"
+      label="Email"
+      status={status}
+      isDisabled={isDisabled}
+    />
   );
 }
 

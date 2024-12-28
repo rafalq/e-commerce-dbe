@@ -1,4 +1,4 @@
-import FormSaveProduct from "@/app/dashboard/products/_components/form-save-product";
+import SaveProductForm from "@/app/dashboard/products/_components/save-product-form";
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
 
@@ -7,5 +7,5 @@ export default async function ProductSave() {
 
   if (session?.user.role !== "admin") return redirect("/dashboard/settings");
 
-  return <FormSaveProduct />;
+  return <SaveProductForm />;
 }

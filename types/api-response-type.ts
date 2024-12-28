@@ -1,4 +1,4 @@
-type TypeApiResponseStatus =
+export type ApiResponseStatusType =
   | "info"
   | "success"
   | "warning"
@@ -9,7 +9,7 @@ type TypeApiResponseStatus =
   | "two-factor-error";
 
 export type ApiResponseType = {
-  status: TypeApiResponseStatus;
+  status: ApiResponseStatusType;
   message?: string;
-  payload?: Record<string, string> | null;
+  payload?: unknown | null;
 };

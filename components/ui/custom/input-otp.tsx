@@ -8,14 +8,14 @@ import { cn } from "@/lib/utils";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { forwardRef } from "react";
 
-type CustomInputProps = Omit<InputProps, "value"> &
+type CustomInputOTPProps = Omit<InputProps, "value"> &
   Omit<InputProps, "onChange"> & {
     value?: string;
     onChange?: () => void;
     slotsAmount: number;
   };
 
-const InputCode = forwardRef<HTMLInputElement, CustomInputProps>(
+const CustomInputOTP = forwardRef<HTMLInputElement, CustomInputOTPProps>(
   ({ slotsAmount, className, ...props }, ref) => {
     return (
       <InputOTP
@@ -35,6 +35,6 @@ const InputCode = forwardRef<HTMLInputElement, CustomInputProps>(
   }
 );
 
-InputCode.displayName = "InputCode";
+CustomInputOTP.displayName = "CustomInputOTP";
 
-export default InputCode;
+export default CustomInputOTP;

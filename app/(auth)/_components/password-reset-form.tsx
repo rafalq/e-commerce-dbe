@@ -41,8 +41,11 @@ export default function PasswordResetForm() {
     onSuccess(data) {
       toast.dismiss();
       setToast(data.data!);
-      if (data.data?.payload?.redirect) {
-        router.push(data.data?.payload.redirect);
+      if (data.data?.payload && typeof data.data.payload === "object") {
+        const payload = data.data.payload as { redirect: string };
+        if (payload.redirect) {
+          router.push(payload.redirect);
+        }
       }
     },
     onError() {
@@ -63,7 +66,10 @@ export default function PasswordResetForm() {
             <Info />
             <EmailField status={status} />
             <BackLink />
-            <SubmitButton status={status} title="send your email">
+            <SubmitButton
+              isLoading={status === "executing"}
+              title="send your email"
+            >
               <SendHorizonal className="w-4 h-4" />
             </SubmitButton>
           </form>

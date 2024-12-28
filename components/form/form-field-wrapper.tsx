@@ -18,11 +18,11 @@ import {
 
 type FormFieldWrapperProps<T extends FieldValues> = {
   name: Path<T>;
-  description?: string;
+  description?: string | ReactNode;
   children: (field: ControllerRenderProps<T, Path<T>>) => ReactNode;
 } & (
   | { label?: undefined; labelIcon?: undefined }
-  | { label: string; labelIcon?: ReactNode }
+  | { label: string | ReactNode; labelIcon?: ReactNode }
 );
 
 export default function FormFieldWrapper<T extends FieldValues>({
@@ -55,7 +55,7 @@ export default function FormFieldWrapper<T extends FieldValues>({
 }
 
 type FormItemWrapperProps<T extends FieldValues> = {
-  description?: string;
+  description?: string | ReactNode;
   field: ControllerRenderProps<T, Path<T>>;
   children: (field: ControllerRenderProps<T, Path<T>>) => ReactNode;
 } & (

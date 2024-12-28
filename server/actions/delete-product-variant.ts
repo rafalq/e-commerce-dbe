@@ -7,6 +7,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { actionClient } from "./index";
+import type { ApiResponseType } from "@/types/api-response-type";
 
 const clientAlgolia = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_ID!,
@@ -20,65 +21,68 @@ export const deleteProductVariant = actionClient
       title: z.string().optional(),
     })
   )
-  .action(async ({ parsedInput: { id: variantId, title } }) => {
-    if (!variantId) {
-      return { status: ["error"], message: "Product variant ID is required." };
-    }
-    try {
-      const variantToDelete = await db.query.productVariants.findFirst({
-        where: eq(productVariants.id, variantId),
-      });
-
-      if (variantToDelete) {
-        const variantType = await db.query.variantTypes.findFirst({
-          where: and(
-            eq(variantTypes.productId, variantToDelete.productId),
-            eq(variantTypes.type, variantToDelete.type)
-          ),
+  .action(
+    async ({
+      parsedInput: { id: variantId, title },
+    }): Promise<ApiResponseType> => {
+      if (!variantId) {
+        return { status: "error", message: "Product variant ID is required." };
+      }
+      try {
+        const variantToDelete = await db.query.productVariants.findFirst({
+          where: eq(productVariants.id, variantId),
         });
 
-        if (variantType && variantType.values) {
-          if (variantType.values.length <= 1) {
-            console.log("len 1", variantType.values);
-            await db
-              .delete(variantTypes)
-              .where(eq(variantTypes.productId, variantToDelete.productId));
+        if (variantToDelete) {
+          const variantType = await db.query.variantTypes.findFirst({
+            where: and(
+              eq(variantTypes.productId, variantToDelete.productId),
+              eq(variantTypes.type, variantToDelete.type)
+            ),
+          });
+
+          if (variantType && variantType.values) {
+            if (variantType.values.length <= 1) {
+              await db
+                .delete(variantTypes)
+                .where(eq(variantTypes.productId, variantToDelete.productId));
+            } else {
+              const updatedValues = variantType.values.filter(
+                (val) => val !== variantToDelete.value
+              );
+              await db
+                .update(variantTypes)
+                .set({ values: updatedValues })
+                .where(eq(variantTypes.productId, variantToDelete.productId));
+            }
           } else {
-            const updatedValues = variantType.values.filter(
-              (val) => val !== variantToDelete.value
-            );
-            await db
-              .update(variantTypes)
-              .set({ values: updatedValues })
-              .where(eq(variantTypes.productId, variantToDelete.productId));
+            throw new Error("Variant type not found");
           }
-        } else {
-          throw new Error("Variant type not found");
         }
+
+        const deletedVariant = await db
+          .delete(productVariants)
+          .where(eq(productVariants.id, variantId))
+          .returning();
+
+        await clientAlgolia.deleteObject({
+          indexName: "products",
+          objectID: variantId.toString(),
+        });
+
+        revalidatePath("/dashboard/products");
+        revalidatePath("/products/[slug]", "page");
+
+        return {
+          status: "success",
+          message: `Variant "${deletedVariant[0].title}" deleted successfully!`,
+        };
+      } catch (error) {
+        console.error(error);
+        return {
+          status: "error",
+          message: `Failed to delete variant "${title}"`,
+        };
       }
-
-      const deletedVariant = await db
-        .delete(productVariants)
-        .where(eq(productVariants.id, variantId))
-        .returning();
-
-      await clientAlgolia.deleteObject({
-        indexName: "products",
-        objectID: variantId.toString(),
-      });
-
-      revalidatePath("/dashboard/products");
-      revalidatePath("/products/[slug]", "page");
-
-      return {
-        status: ["success"],
-        message: `Variant "${deletedVariant[0].title}" deleted successfully!`,
-      };
-    } catch (error) {
-      console.error(error);
-      return {
-        status: ["error"],
-        message: `Failed to delete variant "${title}"`,
-      };
     }
-  });
+  );

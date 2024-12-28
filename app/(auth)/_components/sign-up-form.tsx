@@ -1,21 +1,20 @@
 "use client";
 
 import { CardAuth } from "@/app/(auth)/_components/card-auth";
-import FormFieldWrapper from "@/components/form/form-field-wrapper";
 import CustomLink from "@/components/ui/custom/custom-link";
-import InputPassword from "@/components/ui/custom/input-password";
 import SubmitButton from "@/components/ui/custom/submit-button";
 import { Form } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { setToast } from "@/lib/set-toast";
 import { signUpEmail } from "@/server/actions/sign-up-email";
 import { SignUpSchema, type SignUpSchemaType } from "@/types/sign-up-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserRoundPlus } from "lucide-react";
-import { useAction, type HookActionStatus } from "next-safe-action/hooks";
+import { useAction } from "next-safe-action/hooks";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { AUTH_PATHS } from "@/app/(auth)/_const/auth-paths";
+import TextField from "@/components/form/text-field";
+import PasswordField from "@/components/form/password-field";
 
 export default function SignUpForm() {
   const form = useForm<SignUpSchemaType>({
@@ -55,12 +54,28 @@ export default function SignUpForm() {
       <CardAuth cardTitle="Create an account" showSocials>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
-            <NameField status={status} />
-            <EmailField status={status} />
-            <PasswordField status={status} />
-            <PasswordConfirmationField status={status} />
+            <TextField<SignUpSchemaType>
+              name="name"
+              label="Name"
+              status={status}
+            />
+            <TextField<SignUpSchemaType>
+              name="email"
+              label="Email"
+              status={status}
+            />
+            <PasswordField<SignUpSchemaType>
+              name="password"
+              label="Password"
+              status={status}
+            />
+            <PasswordField<SignUpSchemaType>
+              name="passwordConfirmation"
+              label="Password Confirmation"
+              status={status}
+            />
             <div className="mt-8">
-              <SubmitButton status={status} title="sign up">
+              <SubmitButton isLoading={status === "executing"} title="sign up">
                 <UserRoundPlus className="w-4 h-4" />
               </SubmitButton>
             </div>
@@ -69,45 +84,6 @@ export default function SignUpForm() {
         </Form>
       </CardAuth>
     </section>
-  );
-}
-
-function NameField({ status }: { status: HookActionStatus }) {
-  return (
-    <FormFieldWrapper<SignUpSchemaType> name="name" label="Name">
-      {(field) => <Input {...field} disabled={status === "executing"} />}
-    </FormFieldWrapper>
-  );
-}
-
-function EmailField({ status }: { status: HookActionStatus }) {
-  return (
-    <FormFieldWrapper<SignUpSchemaType> name="email" label="Email">
-      {(field) => <Input {...field} disabled={status === "executing"} />}
-    </FormFieldWrapper>
-  );
-}
-
-function PasswordField({ status }: { status: HookActionStatus }) {
-  return (
-    <FormFieldWrapper<SignUpSchemaType> name="password" label="Password">
-      {(field) => (
-        <InputPassword {...field} disabled={status === "executing"} />
-      )}
-    </FormFieldWrapper>
-  );
-}
-
-function PasswordConfirmationField({ status }: { status: HookActionStatus }) {
-  return (
-    <FormFieldWrapper<SignUpSchemaType>
-      name="passwordConfirmation"
-      label="Password Confirmation"
-    >
-      {(field) => (
-        <InputPassword {...field} disabled={status === "executing"} />
-      )}
-    </FormFieldWrapper>
   );
 }
 
