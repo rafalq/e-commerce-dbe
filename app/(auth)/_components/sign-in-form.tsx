@@ -12,7 +12,10 @@ import SubmitButton from "@/components/ui/custom/submit-button";
 import { Form } from "@/components/ui/form";
 import { setToast } from "@/lib/set-toast";
 import { signInEmail } from "@/server/actions/sign-in-email";
-import { SignInSchema, type SignInSchemaType } from "@/types/sign-in-schema";
+import {
+  SignInSchema,
+  type SignInSchemaType,
+} from "@/types/schema/sign-in-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CircleCheckBig, LogIn } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";

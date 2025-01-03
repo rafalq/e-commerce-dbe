@@ -9,12 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDistance, subMinutes } from "date-fns";
+import OrderDetails from "@/app/dashboard/orders/_components/order-details";
+import { formatPrice } from "@/lib/format-price";
 
-import type { TypeOrder } from "@/types/type-orders";
-import OrderDetails from "./order-details";
+import type { OrderType } from "@/lib/infer-types";
 
 type OrderListProps = {
-  userOrders: TypeOrder[];
+  userOrders: OrderType[];
 };
 
 export default async function OrderList({ userOrders }: OrderListProps) {
@@ -34,7 +35,7 @@ export default async function OrderList({ userOrders }: OrderListProps) {
         {userOrders.map((order) => (
           <TableRow key={order.id}>
             <TableCell>{order.id}</TableCell>
-            <TableCell>${order.total}</TableCell>
+            <TableCell>{formatPrice(order.total)}</TableCell>
             <TableCell>
               <Badge
                 className={

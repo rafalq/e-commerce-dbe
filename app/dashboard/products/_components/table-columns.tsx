@@ -2,22 +2,29 @@
 
 import { PlusCircle } from "lucide-react";
 import Image from "next/image";
-
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-
 import { ColumnDef } from "@tanstack/react-table";
-
 import ProductVariant from "@/app/dashboard/products/_components/product-variant";
 import TableActions from "@/app/dashboard/products/_components/table-actions";
+import VariantDisplayIcon from "@/app/dashboard/products/_components/variant-display-icon";
 
-import type { ProductColumn } from "@/app/dashboard/products/_types/product-column";
-import type { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
-import VariantDisplayIcon from "./variant-display-icon";
+import type { VariantsWithImagesTags } from "@/lib/infer-types";
+import truncateText from "@/lib/truncate-text";
+import { formatPrice } from "@/lib/format-price";
+
+type ProductColumn = {
+  id: number;
+  title: string;
+  description?: string;
+  price: number;
+  image: string;
+  variants: VariantsWithImagesTags[];
+};
 
 export const columns: ColumnDef<ProductColumn>[] = [
   { accessorKey: "id", header: "Id" },
@@ -49,10 +56,17 @@ export const columns: ColumnDef<ProductColumn>[] = [
                       variant={variant}
                       editMode={true}
                     >
-                      <VariantDisplayIcon
-                        color={variant.value}
-                        // text={truncateText(variant.variantTitle!, 1, "")}
-                      />
+                      {variant.type === "color" ? (
+                        <VariantDisplayIcon color={variant.value} />
+                      ) : (
+                        <VariantDisplayIcon
+                          text={truncateText(
+                            variant.title!.toLocaleUpperCase(),
+                            1,
+                            ""
+                          )}
+                        />
+                      )}
                     </ProductVariant>
                   </span>
                 </TooltipTrigger>
@@ -84,12 +98,8 @@ export const columns: ColumnDef<ProductColumn>[] = [
     accessorKey: "price",
     header: "Price",
     cell: ({ row }) => {
-      const price = row.getValue("price") as number;
-      const formatted = new Intl.NumberFormat("en-US", {
-        currency: "USD",
-        style: "currency",
-      }).format(price);
-      return <div className="text-xs">{formatted}</div>;
+      const formattedPrice = formatPrice(row.getValue("price") as number);
+      return <div className="text-xs">{formattedPrice}</div>;
     },
   },
   {

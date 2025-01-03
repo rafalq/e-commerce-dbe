@@ -3,19 +3,19 @@
 import {
   Table,
   TableBody,
-  TableRow,
   TableCell,
   TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import { useCartStore } from "@/store";
-import { AnimatePresence, motion } from "framer-motion";
-import { useMemo } from "react";
 import { formatPrice } from "@/lib/format-price";
-import Image from "next/image";
-import { CreditCard, MinusCircle, PlusCircle } from "lucide-react";
-import Lottie from "lottie-react";
 import emptyCart from "@/public/empty-cart-animation.json";
+import { useCartStore } from "@/store";
 import { createId } from "@paralleldrive/cuid2";
+import { AnimatePresence, motion } from "framer-motion";
+import Lottie from "lottie-react";
+import { ArrowBigRight, MinusCircle, PlusCircle } from "lucide-react";
+import Image from "next/image";
+import { useMemo } from "react";
 import { Button } from "../ui/button";
 
 export default function CartItems() {
@@ -29,7 +29,7 @@ export default function CartItems() {
   }, [cart]);
 
   const priceInLetters = useMemo(() => {
-    const totalPriceStr = totalPrice.toFixed(2).toString();
+    const totalPriceStr = (totalPrice / 100).toFixed(2).toString();
 
     return [...totalPriceStr].map((letter) => {
       return { letter, id: createId() };
@@ -39,7 +39,7 @@ export default function CartItems() {
   return (
     <motion.div className="flex flex-col items-center">
       {cart.length > 0 && (
-        <div className="flex items-center gap-6 mx-auto mb-6">
+        <div className="flex flex-col items-center gap-6 mb-6 w-full">
           <motion.div className="relative flex items-center overflow-hidden">
             Total: <span className="ml-1 text-xl">$</span>
             <AnimatePresence mode="popLayout">
@@ -59,14 +59,14 @@ export default function CartItems() {
             </AnimatePresence>
           </motion.div>
           <Button
-            size="lg"
             onClick={() => {
               setCheckoutProgress("payment-page");
             }}
             disabled={cart.length === 0}
-            className="flex gap-2 max-w-md text-lg"
+            className="flex gap-2 w-1/3 text-lg tracking-wide"
           >
-            CHECKOUT <CreditCard className="w-6 h-6" />
+            Go to Checkout
+            <ArrowBigRight className="w-6 h-6" />
           </Button>
         </div>
       )}
@@ -78,7 +78,7 @@ export default function CartItems() {
             transition={{ delay: 0.3, duration: 0.5 }}
           >
             <h2 className="text-2xl text-center text-muted-foreground">
-              Your cart is empty
+              Your cart is empty!
             </h2>
             <Lottie className="h-56" animationData={emptyCart} />
           </motion.div>

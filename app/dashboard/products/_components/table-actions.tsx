@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import CustomDialog from "@/components/ui/custom-dialog";
+import CustomDialog from "@/components/ui/custom/custom-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { setToast } from "@/lib/set-toast";
 import { deleteProduct } from "@/server/actions/delete-product";
-import type { TypeApiResponse } from "@/types/type-api-response";
 import { MoreHorizontal, Pencil, Trash } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Link from "next/link";
@@ -33,7 +32,7 @@ export default function TableActions({
     },
     onSuccess(data) {
       toast.dismiss();
-      setToast(data.data as TypeApiResponse);
+      setToast(data.data!);
     },
     onError() {
       toast.dismiss();

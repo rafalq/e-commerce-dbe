@@ -13,14 +13,9 @@ export default function Payment() {
   const cart = useCartStore((state) => state.cart);
   const { theme } = useTheme();
 
-  const totalPrice = Math.floor(
-    Math.max(
-      cart.reduce((acc, item: CartItem) => {
-        return acc + item.price * item.variant.quantity;
-      }, 0),
-      0.01
-    ) * 100
-  );
+  const totalPrice = cart.reduce((acc, item: CartItem) => {
+    return acc + item.price * item.variant.quantity;
+  }, 0);
 
   return (
     <motion.div className="mx-auto max-w-2xl">

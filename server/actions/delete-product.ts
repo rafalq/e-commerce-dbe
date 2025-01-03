@@ -3,6 +3,7 @@
 import { actionClient } from "@/server/actions";
 import { db } from "@/server/index";
 import { products, productVariants } from "@/server/schema";
+import type { ApiResponseType } from "@/types/api-response-type";
 import { algoliasearch } from "algoliasearch";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -20,9 +21,9 @@ export const deleteProduct = actionClient
       title: z.string().optional(),
     })
   )
-  .action(async ({ parsedInput: { id, title } }) => {
+  .action(async ({ parsedInput: { id, title } }): Promise<ApiResponseType> => {
     if (!id) {
-      return { status: ["error"], message: "Product ID is required." };
+      return { status: "error", message: "Product ID is required." };
     }
     try {
       const variantsForProduct = await db.query.productVariants.findMany({
@@ -49,13 +50,13 @@ export const deleteProduct = actionClient
       revalidatePath("/products/[slug]", "page");
 
       return {
-        status: ["success"],
+        status: "success",
         message: `Product "${data[0].title}" deleted successfully!`,
       };
     } catch (error) {
       console.error(error);
       return {
-        status: ["error"],
+        status: "error",
         message: `Failed to delete product "${title}".`,
       };
     }

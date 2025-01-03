@@ -6,9 +6,8 @@ import Image from "next/image";
 import { useState } from "react";
 import { useForm, useFormContext } from "react-hook-form";
 import { toast } from "sonner";
-
 import { UploadButton } from "@/app/api/uploadthing/_components";
-import CustomTooltip from "@/components/ui/custom-tooltip";
+import CustomTooltip from "@/components/ui/custom/custom-tooltip";
 import FormCard from "@/components/ui/custom/form-card";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -18,7 +17,6 @@ import {
   updatePassword,
 } from "@/server/actions/update-settings";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import FormFieldWrapper from "@/components/form/form-field-wrapper";
 import PasswordField from "@/components/form/password-field";
 import TextField from "@/components/form/text-field";
@@ -32,10 +30,10 @@ import {
   PasswordSchema,
   type AccountSchemaType,
   type PasswordSchemaType,
-} from "@/types/settings-schema";
+} from "@/types/schema/settings-schema";
+import { isEqual } from "lodash";
 import type { Session } from "next-auth";
 import { useRouter } from "next/navigation";
-import { isEqual } from "lodash";
 
 type SettingsFormProps = {
   session: Session;
@@ -118,6 +116,10 @@ export default function SettingsForm({ session }: SettingsFormProps) {
   );
 
   function onPasswordSubmit(parsedInput: PasswordSchemaType) {
+    // if (parsedInput.newPassword.trim().length <= 0) {
+    //   return toast.warning("You need to provide a new password");
+    // }
+
     passwordExecute(parsedInput);
   }
 

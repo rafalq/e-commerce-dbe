@@ -2,19 +2,17 @@
 
 import { getReviewAverage } from "@/lib/get-review-average";
 import { useMemo } from "react";
-
 import { Card, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-
 import { cn } from "@/lib/utils";
 import { Star } from "lucide-react";
 
-import type { TypeReviewsWithUser } from "@/types/type-review-with-user";
+import type { ReviewsWithUser } from "@/lib/infer-types";
 
 export default function ReviewChart({
   reviews,
 }: {
-  reviews: TypeReviewsWithUser[];
+  reviews: ReviewsWithUser[];
 }) {
   const getRatingByStars = useMemo(() => {
     const ratingValues = Array.from({ length: 5 }, () => 0);
@@ -33,7 +31,7 @@ export default function ReviewChart({
 
   return (
     <Card className="flex flex-col gap-4 p-8 rounded-md">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-full">
         <CardTitle className="flex justify-between w-full">
           <span className="text-primary/80">Product Rating</span>{" "}
           <span className="flex items-center gap-1 text-primary/80">

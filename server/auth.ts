@@ -1,5 +1,5 @@
 import { db } from "@/server";
-import { SignInSchema } from "@/types/sign-in-schema";
+import { SignInSchema } from "@/types/schema/sign-in-schema";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";

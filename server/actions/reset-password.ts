@@ -1,13 +1,14 @@
 "use server";
 
-import type { ApiResponseType } from "@/types/api-response-type";
-import { PasswordResetSchema } from "@/types/password-reset-schema";
+import { PasswordResetSchema } from "@/types/schema/password-reset-schema";
 import { eq } from "drizzle-orm";
 import { actionClient } from ".";
 import { db } from "..";
 import { users } from "../schema";
 import { sendTokenToEmail } from "./send-token-to-email";
 import { generateResetPasswordToken } from "./tokens";
+
+import type { ApiResponseType } from "@/types/api-response-type";
 
 export const resetPassword = actionClient
   .schema(PasswordResetSchema)

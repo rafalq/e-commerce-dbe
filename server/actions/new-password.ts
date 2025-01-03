@@ -1,6 +1,6 @@
 "use server";
 
-import { NewPasswordSchema } from "@/types/new-password-schema";
+import { NewPasswordSchema } from "@/types/schema/new-password-schema";
 import { actionClient } from ".";
 import {
   generateEmailVerificationToken,
@@ -13,6 +13,7 @@ import { sendTokenToEmail } from "@/server/actions/send-token-to-email";
 import bcrypt from "bcrypt";
 import { Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+
 import type { ApiResponseType } from "@/types/api-response-type";
 
 export const newPassword = actionClient

@@ -1,8 +1,8 @@
 "use client";
 
 import { useCartStore } from "@/store";
-import { ArrowLeft } from "lucide-react";
-import { DrawerDescription, DrawerTitle } from "../ui/drawer";
+import { ArrowBigLeft } from "lucide-react";
+import { DrawerDescription, DrawerTitle } from "@/components/ui/drawer";
 
 type CartStageProps = {
   title: string;
@@ -25,7 +25,7 @@ export default function CartStage(props: CartStageProps) {
             onClick={() => setCheckoutProgress("cart-page")}
             className="flex justify-center items-center gap-1 hover:text-primary cursor-pointer"
           >
-            <ArrowLeft size={14} /> Head Back To Cart
+            <ArrowBigLeft size={18} /> Head Back To Cart
           </span>
         )}
 
@@ -37,7 +37,7 @@ export default function CartStage(props: CartStageProps) {
               onClick={() => setCheckoutProgress("cart-page")}
               className="flex justify-center items-center gap-1 hover:text-primary cursor-pointer"
             >
-              <ArrowLeft size={14} /> Head Back To Cart
+              <ArrowBigLeft size={14} /> Head Back To Cart
             </span>
           </div>
         )}

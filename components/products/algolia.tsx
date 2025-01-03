@@ -37,6 +37,7 @@ function Hit({
     };
   };
 }) {
+  // --- NOT WORKING!
   // if (
   //   hit._highlightResult.productTitle.matchLevel === "none" &&
   //   hit._highlightResult.variantTitle.matchLevel === "none"

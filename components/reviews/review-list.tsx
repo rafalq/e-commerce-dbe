@@ -2,13 +2,13 @@
 
 import { motion } from "framer-motion";
 
-import type { TypeReviewsWithUser } from "@/types/type-review-with-user";
+import type { ReviewsWithUser } from "@/lib/infer-types";
 import ReviewDetails from "./review-details";
 
 export default function ReviewList({
   reviews,
 }: {
-  reviews: TypeReviewsWithUser[];
+  reviews: ReviewsWithUser[];
 }) {
   return (
     <motion.div className="gap-4 grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 my-2">

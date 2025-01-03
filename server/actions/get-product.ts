@@ -1,10 +1,11 @@
 "use server";
 
 import { db } from "@/server/index";
-import type { ApiResponseStatusType } from "@/types/api-response-type";
-import type { ProductSchemaType } from "@/types/product-schema";
 import { eq } from "drizzle-orm";
-import { products } from "../schema";
+import { products } from "@/server/schema";
+
+import type { ApiResponseStatusType } from "@/types/api-response-type";
+import type { ProductSchemaType } from "@/types/schema/product-schema";
 
 export async function getProduct(id: number): Promise<{
   status: ApiResponseStatusType;

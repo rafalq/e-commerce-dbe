@@ -3,7 +3,6 @@
 import { Resend } from "resend";
 import getBaseURL from "@/lib/get-base-url";
 import PasswordResetEmail from "@/app/(auth)/_components/password-reset-email";
-import type React from "react";
 import VerificationEmail from "@/app/(auth)/_components/verification-email";
 
 const resend = new Resend(process.env.RESEND_API_KEY);

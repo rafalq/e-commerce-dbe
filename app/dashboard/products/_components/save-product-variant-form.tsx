@@ -8,20 +8,18 @@ import {
   type UseFormReturn,
 } from "react-hook-form";
 
-import type { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { setToast } from "@/lib/set-toast";
 import { cn } from "@/lib/utils";
 import { saveProductVariant } from "@/server/actions/save-product-variant";
-import { type TypeSchemaProductVariant } from "@/types/schema-product-variant";
-
 import { UploadDropzone } from "@/app/api/uploadthing/_components";
-import type { VariantTypesWithValues } from "@/app/dashboard/products/_types/variant-types-with-values";
 import FormFieldWrapper from "@/components/form/form-field-wrapper";
 import TextField from "@/components/form/text-field";
+import Loader from "@/components/ui/custom/loader";
 import { OptionsCombox } from "@/components/ui/custom/options-combox";
+import SubmitButton from "@/components/ui/custom/submit-button";
 import {
   Dialog,
   DialogClose,
@@ -48,22 +46,20 @@ import {
 import truncateText from "@/lib/truncate-text";
 import { deleteProductVariant } from "@/server/actions/delete-product-variant";
 import { getTypeWithValues } from "@/server/actions/get-type-with-values";
-import {
-  ProductVariantSchema,
-  type ProductVariantSchemaType,
-} from "@/types/product-variant-schema";
+import { ProductVariantSchema } from "@/types/schema/product-variant-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Reorder } from "framer-motion";
 import { isEmpty } from "lodash";
 import isEqual from "lodash/isEqual";
+import { FilePenLine, PackagePlus, Trash, Trash2 } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import VariantTagsInput from "./variant-tags-input";
-import { FilePenLine, PackagePlus, Trash, Trash2 } from "lucide-react";
-import SubmitButton from "@/components/ui/custom/submit-button";
-import Loader from "@/components/ui/custom/loader";
+
+import type { ProductVariantSchemaType } from "@/types/schema/product-variant-schema";
+import type { VariantsWithImagesTags } from "@/lib/infer-types";
 
 type FormSaveProductVariantProps = {
   editMode: boolean;
@@ -79,7 +75,7 @@ export default function SaveProductVariantForm({
   onDialogClose,
 }: FormSaveProductVariantProps) {
   const [open, setOpen] = useState(false);
-  const [dbTypes, setDbTypes] = useState<VariantTypesWithValues | null>(null);
+  const [dbTypes, setDbTypes] = useState<Record<string, string[]> | null>(null);
   const [selectedType, setSelectedType] = useState("");
 
   let selectedTypeValues: string[];
@@ -98,8 +94,8 @@ export default function SaveProductVariantForm({
       try {
         if (productId) {
           const response = await getTypeWithValues(productId);
-          if (response.status.includes("success") && response.data) {
-            setDbTypes(response.data);
+          if (response.status.includes("success") && response.payload) {
+            setDbTypes(response.payload as Record<string, string[]>);
           } else {
             toast.error("Failed to load variant types");
           }
@@ -212,7 +208,7 @@ export default function SaveProductVariantForm({
     return hasChanges;
   }
 
-  function onSubmit(parsedInput: TypeSchemaProductVariant) {
+  function onSubmit(parsedInput: ProductVariantSchemaType) {
     if (!isVariantChanged()) {
       toast.warning("No changes detected");
       return;
@@ -522,7 +518,7 @@ function VariantImagesFieldAndTable() {
     getValues,
     setError,
     clearErrors,
-  } = useFormContext<TypeSchemaProductVariant>();
+  } = useFormContext<ProductVariantSchemaType>();
 
   const { fields, remove, append, update, move } = useFieldArray({
     control,

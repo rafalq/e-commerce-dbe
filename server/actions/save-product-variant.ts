@@ -8,14 +8,15 @@ import {
   variantTags,
   variantTypes,
 } from "@/server/schema";
-import type { ApiResponseType } from "@/types/api-response-type";
-import { ProductVariantSchema } from "@/types/product-variant-schema";
+import { ProductVariantSchema } from "@/types/schema/product-variant-schema";
 import { algoliasearch } from "algoliasearch";
 import { eq } from "drizzle-orm";
 import { isEmpty } from "lodash";
 import { revalidatePath } from "next/cache";
 import { getTypeWithValues } from "./get-type-with-values";
 import { actionClient } from "./index";
+
+import type { ApiResponseType } from "@/types/api-response-type";
 
 const clientAlgolia = algoliasearch(
   process.env.NEXT_PUBLIC_ALGOLIA_ID!,
@@ -44,7 +45,10 @@ export const saveProductVariant = actionClient
 
         if (!product) throw new Error("Product not found");
 
-        const dbTypes = (await getTypeWithValues(productId)).data;
+        const dbTypes = (await getTypeWithValues(productId)).payload as Record<
+          string,
+          string[]
+        >;
 
         if (!isEmpty(dbTypes) && type in dbTypes) {
           const updatedDbTypes = Array.from(new Set([...dbTypes[type], value]));
@@ -183,7 +187,7 @@ export const saveProductVariant = actionClient
 
           return {
             status: "success",
-            message: `Added ${title} successfully!`,
+            message: `Added "${title}" successfully!`,
           };
         }
       } catch (error) {

@@ -65,40 +65,46 @@ export default async function ProductPage({
             />
           </div>
 
-          <div className="flex flex-col md:place-content-start md:w-2/5">
+          <div className="flex flex-col md:place-content-start w-full md:w-2/5">
             <h1 className="font-bold text-4xl">{variant?.product.title}</h1>
-            <div className="flex flex-col gap-2">
-              <ProductVariant variants={variant.product.productVariants} />
-              {variant.product.reviews.length > 0 && (
-                <Stars
-                  rating={reviewAvg}
-                  totalReviews={variant.product.reviews.length}
-                />
-              )}
-            </div>
-            <div className="flex flex-col gap-2 mt-2">
-              <div className="flex gap-4 my-4">
-                {variant.product.productVariants.map((prodVariant) => (
-                  <ProductVariantPick
-                    key={prodVariant.id}
-                    id={prodVariant.id}
-                    variantTitle={prodVariant.title || ""}
-                    type={prodVariant.type}
-                    value={prodVariant.value}
-                    productId={variant.productId}
-                    productTitle={variant.product.title}
-                    price={variant.product.price}
-                    image={prodVariant.variantImages[0].url}
-                  />
-                ))}
+            <ProductVariant variants={variant.product.productVariants} />
+            <div className="flex flex-row md:flex-col">
+              <div className="flex-1">
+                <div className="flex flex-col gap-2">
+                  {variant.product.reviews.length > 0 && (
+                    <Stars
+                      rating={reviewAvg}
+                      totalReviews={variant.product.reviews.length}
+                    />
+                  )}
+                </div>
+                <div className="flex flex-col gap-2 mt-2">
+                  <div className="flex gap-4 my-4">
+                    {variant.product.productVariants.map((prodVariant) => (
+                      <ProductVariantPick
+                        key={prodVariant.id}
+                        id={prodVariant.id}
+                        variantTitle={prodVariant.title || ""}
+                        type={prodVariant.type}
+                        value={prodVariant.value}
+                        productId={variant.productId}
+                        productTitle={variant.product.title}
+                        price={variant.product.price}
+                        image={prodVariant.variantImages[0].url}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <p className="py-4 font-medium text-2xl">
+                  {formatPrice(variant.product.price)}
+                </p>
+              </div>
+              {/* --- add to cart */}
+              <div className="flex-1 md:mb-8 w-full">
+                <CartAdd />
               </div>
             </div>
-            <p className="py-4 font-medium text-2xl">
-              {formatPrice(variant.product.price)}
-            </p>
-            <div className="flex flex-col mb-8 w-full">
-              <CartAdd />
-            </div>
+            {/* --- description */}
             {variant.product.description.length > 0 ? (
               <div
                 dangerouslySetInnerHTML={{

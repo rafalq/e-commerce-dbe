@@ -25,3 +25,68 @@ export type InferResultType<
     with: With;
   }
 >;
+
+// ---- TYPES -----
+
+export type UserWithOrders = InferResultType<
+  "users",
+  {
+    orders: true;
+    products: true;
+    productVariants: { with: { variantImages: true } };
+  }
+>;
+
+export type ProductsWithVariants = InferResultType<
+  "products",
+  { productVariants: true }
+>;
+
+export type Variant = InferResultType<"productVariants">;
+
+export type VariantTypes = InferResultType<
+  "products",
+  { products: true; productVariants: true; productVariantTypes: true }
+>;
+
+export type VariantTypeWithValues = InferResultType<"variantTypes">;
+
+export type VariantsWithProduct = InferResultType<
+  "productVariants",
+  { variantImages: true; variantTags: true; product: true }
+>;
+
+export type VariantsWithImagesTags = InferResultType<
+  "productVariants",
+  { variantImages: true; variantTags: true }
+>;
+
+export type OrderType = InferResultType<
+  "orders",
+  {
+    orderProduct: {
+      with: {
+        product: true;
+        productVariants: { with: { variantImages: true } };
+      };
+    };
+  }
+>;
+
+export type OrderProductType = InferResultType<
+  "orderProduct",
+  {
+    order: { with: { user: true } };
+    product: true;
+    productVariants: {
+      with: { variantImages: true };
+    };
+  }
+>;
+
+export type ReviewsWithUser = InferResultType<
+  "reviews",
+  {
+    user: true;
+  }
+>;

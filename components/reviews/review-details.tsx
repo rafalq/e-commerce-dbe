@@ -8,13 +8,9 @@ import Stars from "@/components/reviews/stars";
 
 import { Card } from "@/components/ui/card";
 
-import type { TypeReviewsWithUser } from "@/types/type-review-with-user";
+import type { ReviewsWithUser } from "@/lib/infer-types";
 
-export default function ReviewDetails({
-  review,
-}: {
-  review: TypeReviewsWithUser;
-}) {
+export default function ReviewDetails({ review }: { review: ReviewsWithUser }) {
   return (
     <Card key={review.id} className="shadow p-8 w-auto h-full">
       <div className="flex items-center gap-2">

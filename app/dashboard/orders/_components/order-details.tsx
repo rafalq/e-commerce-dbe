@@ -25,11 +25,12 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { formatPrice } from "@/lib/format-price";
 
-import type { TypeOrder } from "@/types/type-orders";
+import type { OrderType } from "@/lib/infer-types";
 
 type OrderDetailsProps = {
-  order: TypeOrder;
+  order: OrderType;
 };
 
 export default async function OrderDetails({ order }: OrderDetailsProps) {
@@ -67,7 +68,7 @@ export default async function OrderDetails({ order }: OrderDetailsProps) {
             Your order total is ${order.total}
           </DialogDescription>
         </DialogHeader>
-        <Card className="flex flex-col gap-4 p-2 overflow-auto">
+        <Card className="flex flex-col gap-4 border-0 p-2 overflow-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -90,7 +91,7 @@ export default async function OrderDetails({ order }: OrderDetailsProps) {
                         alt={product.title}
                       />
                     </TableCell>
-                    <TableCell>${product.price}</TableCell>
+                    <TableCell>{formatPrice(product.price)}</TableCell>
                     <TableCell>{product.title}</TableCell>
                     <TableCell>
                       <div

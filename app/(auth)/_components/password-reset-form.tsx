@@ -11,7 +11,7 @@ import { resetPassword } from "@/server/actions/reset-password";
 import {
   PasswordResetSchema,
   type PasswordResetSchemaType,
-} from "@/types/password-reset-schema";
+} from "@/types/schema/password-reset-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SendHorizonal } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";

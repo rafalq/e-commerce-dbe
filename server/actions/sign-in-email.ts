@@ -3,10 +3,9 @@
 import { actionClient } from "@/server/actions";
 import { db } from "@/server/index";
 import { twoFactorTokens, users } from "@/server/schema";
-import { SignInSchema } from "@/types/sign-in-schema";
+import { SignInSchema } from "@/types/schema/sign-in-schema";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
-
 import { sendTokenToEmail } from "@/server/actions/send-token-to-email";
 import {
   generateEmailVerificationToken,
@@ -14,9 +13,10 @@ import {
   getTwoFactorTokenByEmail,
 } from "@/server/actions/tokens";
 import { signIn } from "@/server/auth";
-import type { ApiResponseType } from "@/types/api-response-type";
 import { AuthError } from "next-auth";
 import { sendTwoFactorTokenToEmail } from "./send-two-factor-token-to-email";
+
+import type { ApiResponseType } from "@/types/api-response-type";
 
 export async function handleTwoFactorToken(
   email: string,

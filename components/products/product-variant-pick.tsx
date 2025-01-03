@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import truncateText from "@/lib/truncate-text";
 
 type ProductVariantPickProps = {
   id: number;
@@ -37,12 +38,13 @@ export default function ProductPick({
         )
       }
       className={cn(
-        "w-6 h-6 rounded-full cursor-pointer opacity-50 hover:opacity-75  scale-100 transition-all duration-300 ease-in-out ",
+        "w-6 h-6 rounded-full cursor-pointer opacity-50 hover:opacity-75  scale-100 transition-all duration-300 ease-in-out flex justify-center items-center text-sm",
         selectedVariant === variantTitle &&
-          "opacity-100 scale-110 shadow-md shadow-primary ",
-        ""
+          "opacity-100 scale-110 shadow-md shadow-primary "
       )}
       {...(type === "color" && { style: { background: value } })}
-    ></div>
+    >
+      {type !== "color" && truncateText(variantTitle.toUpperCase(), 1, "")}
+    </div>
   );
 }

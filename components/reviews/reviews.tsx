@@ -7,7 +7,7 @@ import { eq } from "drizzle-orm";
 import FormReviews from "@/components/reviews/form-reviews";
 import ReviewDetails from "@/components/reviews/review-details";
 
-import type { TypeReviewsWithUser } from "@/types/type-review-with-user";
+import type { ReviewsWithUser } from "@/lib/infer-types";
 
 export default async function Reviews({ productId }: { productId: number }) {
   const session = await auth();
@@ -17,7 +17,7 @@ export default async function Reviews({ productId }: { productId: number }) {
     where: eq(reviews.productId, productId),
   });
 
-  const dataOmitLast = (data: TypeReviewsWithUser[]) => {
+  const dataOmitLast = (data: ReviewsWithUser[]) => {
     if (!data || data.length === 0 || data.length === 1) {
       return [];
     }
@@ -29,16 +29,16 @@ export default async function Reviews({ productId }: { productId: number }) {
   };
 
   const dataWithoutLast = dataOmitLast(data);
-  const dataOnlyLast: TypeReviewsWithUser = data[data.length - 1];
+  const dataOnlyLast: ReviewsWithUser = data[data.length - 1];
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex md:flex-row flex-col gap-4">
-        <div className="flex flex-col gap-4 w-3/5 h-full">
+        <div className="flex flex-col gap-4 md:w-3/5 h-full">
           <h3 className="w-full font-semibold text-3xl">Customers Reviews</h3>
           {data.length > 0 && <ReviewChart reviews={data} />}
         </div>
-        <div className="flex flex-col gap-4 w-2/5 h-full">
+        <div className="flex flex-col gap-4 md:w-2/5 h-full">
           {session && <FormReviews />}
           {data.length > 0 && (
             <div className="h-[266px]">

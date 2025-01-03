@@ -8,11 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import type { TypeOrderProduct } from "@/types/type-order-product";
 import { cn } from "@/lib/utils";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
+import { monthlyChart } from "@/app/dashboard/analytics/_components/monthly-chart";
+import { weeklyChart } from "@/app/dashboard/analytics/_components/weekly-chart";
 import {
   Bar,
   BarChart,
@@ -21,13 +22,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { monthlyChart } from "@/app/dashboard/analytics/_components/monthly-chart";
-import { weeklyChart } from "@/app/dashboard/analytics/_components/weekly-chart";
+
+import type { OrderProductType } from "@/lib/infer-types";
 
 export default function Earnings({
   totalOrders,
 }: {
-  totalOrders: TypeOrderProduct[];
+  totalOrders: OrderProductType[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const SchemaOrder = z.object({
+export const OrderSchema = z.object({
   total: z.number(),
   status: z.string(),
   paymentIntentId: z.string(),
@@ -13,4 +13,4 @@ export const SchemaOrder = z.object({
   ),
 });
 
-export type TypeSchemaOrder = z.infer<typeof SchemaOrder>;
+export type OrderSchemaOrder = z.infer<typeof OrderSchema>;

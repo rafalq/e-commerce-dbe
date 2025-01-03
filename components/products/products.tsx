@@ -1,12 +1,13 @@
 "use client";
 
-import type { VariantsWithProduct } from "@/app/dashboard/products/_types/variants-with-product";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice } from "@/lib/format-price";
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
+
+import type { VariantsWithProduct } from "@/lib/infer-types";
 
 type ProductsProps = {
   pVariants: VariantsWithProduct[];

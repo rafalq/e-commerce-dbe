@@ -1,4 +1,4 @@
-type InputType =
+export type InputType =
   | "button"
   | "checkbox"
   | "color"
@@ -21,11 +21,3 @@ type InputType =
   | "time"
   | "url"
   | "week";
-
-export type FormAuthInput = {
-  custom?: boolean;
-  label?: string;
-  type: InputType;
-  placeholder?: string;
-  autoComplete?: string;
-};

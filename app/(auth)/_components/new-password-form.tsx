@@ -11,8 +11,8 @@ import type { ApiResponseType } from "@/types/api-response-type";
 import {
   NewPasswordSchema,
   type NewPasswordSchemaType,
-} from "@/types/new-password-schema";
-import { type SignUpSchemaType } from "@/types/sign-up-schema";
+} from "@/types/schema/new-password-schema";
+import { type SignUpSchemaType } from "@/types/schema/sign-up-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RefreshCcw } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";

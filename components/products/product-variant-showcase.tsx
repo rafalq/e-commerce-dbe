@@ -2,16 +2,15 @@
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-
-import { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
 import {
   Carousel,
   CarouselApi,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-
 import { cn } from "@/lib/utils";
+
+import { VariantsWithImagesTags } from "@/lib/infer-types";
 
 export default function ProductVariantShowcase({
   variants,

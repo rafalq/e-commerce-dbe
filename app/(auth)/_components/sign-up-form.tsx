@@ -6,7 +6,10 @@ import SubmitButton from "@/components/ui/custom/submit-button";
 import { Form } from "@/components/ui/form";
 import { setToast } from "@/lib/set-toast";
 import { signUpEmail } from "@/server/actions/sign-up-email";
-import { SignUpSchema, type SignUpSchemaType } from "@/types/sign-up-schema";
+import {
+  SignUpSchema,
+  type SignUpSchemaType,
+} from "@/types/schema/sign-up-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UserRoundPlus } from "lucide-react";
 import { useAction } from "next-safe-action/hooks";

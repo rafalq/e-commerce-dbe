@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import Loader from "@/components/ui/custom/loader";
 import { createOrder } from "@/server/actions/create-order";
 import {
   createPaymentIntent,
@@ -16,10 +18,9 @@ import { useAction } from "next-safe-action/hooks";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import CustomLoader from "@/components/ui/custom-loader";
-import { Barcode } from "lucide-react";
-import type { TypeApiResponse } from "@/types/type-api-response";
+
+import { formatPrice } from "@/lib/format-price";
+import type { ApiResponseType } from "@/types/api-response-type";
 
 export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,12 +45,12 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
 
       if (data.data?.status.includes("error")) {
         toast.error(data.data.message || "Something went wrong.");
-      } else if (data.data?.status[0] === "success") {
+      } else if (data.data?.status.includes("success")) {
         setIsLoading(false);
         toast.success(data.data.message || "Operation done successfully!");
         setCheckoutProgress("confirmation-page");
         clearCart();
-      } else if (data.data?.status[0] === "warning") {
+      } else if (data.data?.status.includes("warning")) {
         toast.warning(data.data.message || "Operation suspended.");
       }
     },
@@ -99,8 +100,8 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
 
     if (dataPaymentIntent?.data?.status.includes("success")) {
       const { clientSecretId, user, paymentIntentId } = (
-        dataPaymentIntent?.data as TypeApiResponse
-      ).data as TypePaymentIntentSuccessData;
+        dataPaymentIntent?.data as ApiResponseType
+      ).payload as TypePaymentIntentSuccessData;
 
       const { error } = await stripe.confirmPayment({
         elements,
@@ -134,19 +135,20 @@ export default function PaymentForm({ totalPrice }: { totalPrice: number }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2 w-full">
       <PaymentElement />
       <AddressElement options={{ mode: "shipping" }} />
       <Button
         size="lg"
         disabled={!stripe || !elements || isLoading}
-        className="my-4 self-end"
+        className="my-4"
       >
         {isLoading ? (
-          <CustomLoader size={4} text="Processing..." />
+          <Loader size={6} text="Processing..." />
         ) : (
-          <span className="flex justify-center items-center gap-2 text-lg">
-            PAY NOW <Barcode className="w-6 h-6" />
+          <span className="flex justify-center items-center gap-2 text-xl uppercase tracking-wide">
+            PAY
+            <span>{formatPrice(totalPrice)}</span>
           </span>
         )}
       </Button>

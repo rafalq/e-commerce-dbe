@@ -72,14 +72,14 @@ export default function CartAdd() {
         onClick={() => {
           toast.success(`Added "${title + " " + variant}" to your cart!`);
           addToCart({
-            id: productId,
+            id,
             variant: { variantId: id, quantity },
             name: title + " " + variant,
             price,
             image,
           });
         }}
-        className="flex justify-center items-center gap-2"
+        className="flex justify-center items-center gap-2 w-full text-lg uppercase tracking-wide"
       >
         ADD TO CART <ShoppingBag className="w-4 h-4" />
       </Button>

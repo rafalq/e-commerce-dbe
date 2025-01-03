@@ -1,11 +1,12 @@
 "use client";
 
+import orderPaid from "@/public/order-paid.json";
+import { useCartStore } from "@/store";
+import { motion } from "framer-motion";
+import Lottie from "lottie-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { useCartStore } from "@/store";
-import Lottie from "lottie-react";
-import { motion } from "framer-motion";
-import orderConfirmed from "@/public/order-confirmed-animation.json";
+import { Telescope } from "lucide-react";
 
 export default function OrderConfirmed() {
   const { setCheckoutProgress, setCartOpen } = useCartStore();
@@ -16,18 +17,19 @@ export default function OrderConfirmed() {
         initial={{ opacity: 0, scale: 0 }}
         transition={{ delay: 0.35 }}
       >
-        <Lottie className="mb-4 h-40" animationData={orderConfirmed} />
+        <Lottie animationData={orderPaid} />
       </motion.div>
       <h2 className="font-medium text-2xl">Thank you for your purchase!</h2>
-      <Link href={"/dashboard/orders"}>
+      <Link href={"/dashboard/orders"} className="w-1/3">
         <Button
           variant={"secondary"}
           onClick={() => {
             setCheckoutProgress("cart-page");
             setCartOpen(false);
           }}
+          className="flex justify-center items-center gap-2 w-full text-lg"
         >
-          View your order
+          View your order <Telescope className="w-8 h-8" />
         </Button>
       </Link>
     </div>

@@ -17,8 +17,6 @@ import {
 
 import placeholderUser from "@/public/placeholder-user.jpg";
 import Image from "next/image";
-
-import type { TypeOrderProduct } from "@/types/type-order-product";
 import {
   Tooltip,
   TooltipContent,
@@ -27,10 +25,13 @@ import {
 } from "@/components/ui/tooltip";
 import truncateText from "@/lib/truncate-text";
 
+import type { OrderProductType } from "@/lib/infer-types";
+import { formatPrice } from "@/lib/format-price";
+
 export default function Sales({
   totalOrders,
 }: {
-  totalOrders: TypeOrderProduct[];
+  totalOrders: OrderProductType[];
 }) {
   const sliced = totalOrders.slice(0, 8);
   return (
@@ -90,7 +91,7 @@ export default function Sales({
                   )}
                 </TableCell>
                 <TableCell>{product.title}</TableCell>
-                <TableCell>${product.price}</TableCell>
+                <TableCell>{formatPrice(product.price)}</TableCell>
                 <TableCell>{quantity}</TableCell>
                 <TableCell>
                   <Image

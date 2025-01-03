@@ -1,6 +1,6 @@
 "use server";
 
-import { SignUpSchema } from "@/types/sign-up-schema";
+import { SignUpSchema } from "@/types/schema/sign-up-schema";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import { actionClient } from ".";
@@ -9,6 +9,7 @@ import { users } from "../schema";
 import { sendTokenToEmail } from "./send-token-to-email";
 import { generateEmailVerificationToken } from "./tokens";
 import Stripe from "stripe";
+
 import type { ApiResponseType } from "@/types/api-response-type";
 
 export const signUpEmail = actionClient

@@ -1,8 +1,9 @@
 "use client";
 
-import { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+
+import type { VariantsWithImagesTags } from "@/lib/infer-types";
 
 export default function ProductVariant({
   variants,

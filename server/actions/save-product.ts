@@ -1,10 +1,9 @@
 "use server";
 
-import { hasChanges } from "@/lib/has-changes";
 import { actionClient } from "@/server/actions/index";
 import { db } from "@/server/index";
 import type { ApiResponseType } from "@/types/api-response-type";
-import { ProductSchema } from "@/types/product-schema";
+import { ProductSchema } from "@/types/schema/product-schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { products } from "../schema";
@@ -25,20 +24,6 @@ export const saveProduct = actionClient
 
           if (!currentProduct)
             return { status: "error", message: "Product not found." };
-
-          // --- if no changes made
-
-          const hasUpdates = hasChanges({
-            currentData: currentProduct,
-            newData: { title, description, price },
-          });
-
-          if (!hasUpdates) {
-            return {
-              status: "warning",
-              message: "No changes detected to update",
-            };
-          }
 
           // --- else update the product
 

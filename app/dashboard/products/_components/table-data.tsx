@@ -10,7 +10,6 @@ import {
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
-import CustomTooltip from "@/components/ui/custom-tooltip";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -20,6 +19,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -152,11 +157,19 @@ export function TableData<TData, TValue>({
               <ChevronLeft className="w-4 h-4" />
               <span className="md:block hidden">Previous</span>
             </Button>
-            <CustomTooltip text="Page number">
-              <p className="bg-secondary px-4 py-2 font-semibold text-sm">
-                {pagination.pageIndex + 1}
-              </p>
-            </CustomTooltip>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <p className="bg-secondary px-4 py-2 font-semibold text-sm">
+                    {pagination.pageIndex + 1}
+                  </p>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Page Number</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+
             <Button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
@@ -178,21 +191,28 @@ export function TableData<TData, TValue>({
               <ChevronsRight className="w-4 h-4" />
             </Button>
           </div>
-          <CustomTooltip text="Select maximum number of rows  per page">
-            <select
-              value={table.getState().pagination.pageSize}
-              onChange={(e) => {
-                table.setPageSize(Number(e.target.value));
-              }}
-              className="p-2 text-sm"
-            >
-              {[1, 5, 10, 20, 40].map((pageSize) => (
-                <option key={pageSize} value={pageSize}>
-                  {pageSize}
-                </option>
-              ))}
-            </select>
-          </CustomTooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <select
+                  value={table.getState().pagination.pageSize}
+                  onChange={(e) => {
+                    table.setPageSize(Number(e.target.value));
+                  }}
+                  className="p-2 text-sm"
+                >
+                  {[1, 5, 10, 20, 40].map((pageSize) => (
+                    <option key={pageSize} value={pageSize}>
+                      {pageSize}
+                    </option>
+                  ))}
+                </select>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Select maximum number of rows per page</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
     </div>

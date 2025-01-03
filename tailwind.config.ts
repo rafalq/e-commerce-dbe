@@ -21,6 +21,9 @@ const config: Config = withUt({
       minHeight: {
         "50vh": "50vh",
       },
+      fontFamily: {
+        sans: ["var(--font-lato)"],
+      },
       colors: {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",

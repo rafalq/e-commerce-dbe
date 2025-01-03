@@ -10,23 +10,29 @@ import Tiptap from "@/components/ui/tiptap";
 import { setToast } from "@/lib/set-toast";
 import { getProduct } from "@/server/actions/get-product";
 import { saveProduct } from "@/server/actions/save-product";
-import type { ApiResponseType } from "@/types/api-response-type";
-import { ProductSchema, type ProductSchemaType } from "@/types/product-schema";
-import { type TypeSchemaProduct } from "@/types/schema-product";
+import { ProductSchema } from "@/types/schema/product-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isEqual } from "lodash";
-import { DollarSign, PackagePlus } from "lucide-react";
+import { DollarSign, FilePenLine, PackagePlus } from "lucide-react";
 import { useAction, type HookActionStatus } from "next-safe-action/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import type { ApiResponseType } from "@/types/api-response-type";
+import type { ProductSchemaType } from "@/types/schema/product-schema";
+
 type TiptapRef = {
   clearContent: () => void;
 };
 
 export default function FormSaveProduct() {
+  const [currentData, setCurrentData] = useState({
+    title: "",
+    description: "",
+    price: 0,
+  });
   const tiptapRef = useRef<TiptapRef | null>(null);
 
   const form = useForm<ProductSchemaType>({
@@ -68,6 +74,14 @@ export default function FormSaveProduct() {
         form.setValue("description", product.description);
         form.setValue("price", product.price);
         form.setValue("id", id);
+
+        const dbData = {
+          title: product.title,
+          description: product.description,
+          price: product.price,
+        };
+
+        setCurrentData({ ...currentData, ...dbData });
       }
     }
   }
@@ -89,12 +103,15 @@ export default function FormSaveProduct() {
     },
   });
 
-  function onSubmit(parsedInput: TypeSchemaProduct) {
+  function onSubmit(parsedInput: ProductSchemaType) {
     if (editMode) {
-      const currentData = form.control._defaultValues;
-      const newData = form.getValues();
+      const newData = {
+        title: parsedInput.title,
+        description: parsedInput.description,
+        price: parsedInput.price,
+      };
 
-      if (!isEqual(currentData, newData)) {
+      if (isEqual(currentData, newData)) {
         toast.warning("No changes detected");
         return;
       }
@@ -129,12 +146,21 @@ export default function FormSaveProduct() {
 
           {/* ---- submit button ---- */}
           <div className="mt-8">
-            <SubmitButton
-              isLoading={status === "executing"}
-              title="create product"
-            >
-              <PackagePlus className="w-4 h-4" />
-            </SubmitButton>
+            {!editMode ? (
+              <SubmitButton
+                isLoading={status === "executing"}
+                title="create product"
+              >
+                <PackagePlus className="w-4 h-4" />
+              </SubmitButton>
+            ) : (
+              <SubmitButton
+                isLoading={status === "executing"}
+                title="update product"
+              >
+                <FilePenLine className="w-4 h-4" />
+              </SubmitButton>
+            )}
           </div>
         </form>
       </Form>

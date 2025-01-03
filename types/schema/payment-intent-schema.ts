@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const SchemaPaymentIntent = z.object({
+export const PaymentIntentSchema = z.object({
   amount: z.number(),
   currency: z.string(),
   cart: z.array(
@@ -14,4 +14,4 @@ export const SchemaPaymentIntent = z.object({
   ),
 });
 
-export type TypeSchemaProduct = z.infer<typeof SchemaPaymentIntent>;
+export type PaymentIntentSchemaType = z.infer<typeof PaymentIntentSchema>;

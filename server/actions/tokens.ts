@@ -7,9 +7,10 @@ import {
   users,
   verificationTokens,
 } from "@/server/schema";
-import type { ApiResponseType } from "@/types/api-response-type";
 import { randomInt } from "crypto";
 import { eq } from "drizzle-orm";
+
+import type { ApiResponseType } from "@/types/api-response-type";
 
 // --- email verification ---
 

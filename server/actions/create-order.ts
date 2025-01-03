@@ -4,28 +4,28 @@ import { auth } from "../auth";
 import { db } from "@/server";
 import { orderProduct, orders } from "../schema";
 import { actionClient } from "@/server/actions";
-import { SchemaOrder } from "@/types/schema-order";
-import type { TypeApiResponse } from "@/types/type-api-response";
+import { OrderSchema } from "@/types/schema/order-schema";
+import type { ApiResponseType } from "@/types/api-response-type";
 
 export const createOrder = actionClient
-  .schema(SchemaOrder)
+  .schema(OrderSchema)
   .action(
-    async ({ parsedInput: { total, status, products, paymentIntentId } }) => {
+    async ({
+      parsedInput: { total, status, products, paymentIntentId },
+    }): Promise<ApiResponseType> => {
       try {
         const user = await auth();
 
         if (!user)
           return {
-            status: ["error"],
+            status: "error",
             message: "User not found",
-          } as TypeApiResponse;
-
-        const formattedTotal = +(total / 100).toFixed(2);
+          };
 
         const order = await db
           .insert(orders)
           .values({
-            total: formattedTotal,
+            total,
             status,
             paymentIntentId,
             userId: user.user.id,
@@ -42,13 +42,13 @@ export const createOrder = actionClient
         });
 
         return {
-          status: ["success"],
+          status: "success",
           message: "Order added successfully!",
-        } as TypeApiResponse;
+        };
       } catch (error) {
         console.error(error);
         return {
-          status: ["error"],
+          status: "error",
           message:
             "Payment was successful but something went wrong with creating the receipt. Contact our customer service.",
         };

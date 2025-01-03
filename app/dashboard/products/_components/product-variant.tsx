@@ -1,5 +1,6 @@
 "use client";
 
+import { forwardRef, useState, type PropsWithRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,8 +12,7 @@ import {
 
 import SaveProductVariantForm from "@/app/dashboard/products/_components/save-product-variant-form";
 
-import type { VariantsWithImagesTags } from "@/app/dashboard/products/_types/variants-with-images-tags";
-import { forwardRef, useState, type PropsWithRef } from "react";
+import type { VariantsWithImagesTags } from "@/lib/infer-types";
 
 type ProductVariantProps = {
   editMode: boolean;
@@ -29,7 +29,7 @@ const ProductVariant: React.FC<PropsWithRef<ProductVariantProps>> = forwardRef(
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger>{children}</DialogTrigger>
 
-        <DialogContent className="md:w-[420px] max-w-screen-sm max-h-[740px] md:max-h-[500px] overflow-x-hidden scrollbarY">
+        <DialogContent className="md:w-[420px] max-w-screen-sm max-h-[740px] md:max-h-[90vh] overflow-x-hidden scrollbarY">
           <div className="p-4">
             <DialogHeader className="pb-6">
               <DialogTitle className="font-semibold text-3xl text-center">
